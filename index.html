@@ -279,6 +279,58 @@ body.ingame{overflow:hidden;height:100%}html:has(body.ingame){overflow:hidden}
 @keyframes jump{40%{transform:translateY(-25%)}}
 </style>
 <style>body.ingame .toast{bottom:auto;top:calc(54px + env(safe-area-inset-top,0px));transform:translate(-50%,-30px)}body.ingame .toast.on{transform:translate(-50%,0)}</style>
+<style>
+/* ===== v5 ===== */
+.stamp{top:auto;bottom:62px;right:12px}
+.menu button{font-size:12px}
+.menu{grid-template-columns:repeat(4,1fr)}
+.menu button small{color:var(--brass);font-size:11px}
+.chip{touch-action:pan-x}
+.board{touch-action:none}
+.cell.hover{box-shadow:inset 0 0 0 3px #fff;filter:brightness(1.15)}
+.dragghost{position:fixed;left:-30px;top:-46px;width:60px;height:60px;border-radius:50%;background:#fbf6ea;display:grid;place-items:center;font-size:36px;z-index:95;pointer-events:none;box-shadow:0 10px 24px rgba(0,0,0,.55),0 0 0 3px var(--red)}
+.candle{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.candle i{position:relative;width:8px;height:22px;border-radius:2px;background:linear-gradient(#efe6d6,#cbbfa8);transform-origin:bottom;transform:scaleY(calc(.25 + .75*var(--left,1)))}
+.candle i::before{content:"";position:absolute;left:50%;top:-9px;width:7px;height:10px;margin-left:-3.5px;border-radius:50% 50% 45% 45%;background:radial-gradient(circle at 50% 70%,#fff3b0,#ffb347 55%,#ff6a00);animation:flame .18s ease-in-out infinite alternate;box-shadow:0 0 10px 3px rgba(255,170,60,.5)}
+@keyframes flame{to{transform:scale(1.15,.9) rotate(4deg)}}
+.candle.low i::before{animation-duration:.08s}
+.candle.out i::before{display:none}
+.candle.out .timer{color:var(--red)}
+.lineup{display:flex;justify-content:center;gap:8px;margin-top:14px;font-size:30px}
+.lineup span{animation:drop .4s cubic-bezier(.3,1.6,.5,1) both}
+.slam.soft{color:#7a5a20;border-color:#7a5a20}
+.cfh{display:flex;justify-content:space-between;align-items:center;font-family:var(--f-type);color:var(--red);letter-spacing:.1em;font-size:13px}
+.cfh .dots{display:flex;gap:5px}
+.cfh .dots i{width:11px;height:11px;border-radius:50%;background:rgba(42,32,24,.2)}
+.cfh .dots i.cur{background:var(--brass);box-shadow:0 0 0 2px rgba(217,166,72,.4)}
+.cfh .dots i.ok{background:var(--green)}.cfh .dots i.no{background:var(--red)}
+.bubble{display:flex;gap:10px;align-items:flex-start;margin:10px 0 8px;animation:fadein .25s}
+.bubble .av{font-size:36px;line-height:1;flex-shrink:0}
+.bubble .say{flex:1;background:#fff8ea;border:2px solid rgba(42,32,24,.25);border-radius:4px 14px 14px 14px;padding:9px 12px;font-size:15px;line-height:1.4}
+.tbar{height:6px;border-radius:99px;background:rgba(42,32,24,.15);overflow:hidden}
+.tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--red),var(--brass));transform-origin:left;animation:tbar linear forwards}
+@keyframes tbar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.cfb{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.cfb button{font-family:var(--f-type);font-size:17px;padding:14px 6px;border-radius:12px;letter-spacing:.04em;color:#fff}
+.cfy{background:var(--green)}.cfn{background:var(--red)}
+.cfs{text-align:center;font-family:var(--f-body);font-weight:800;font-size:13px;margin-top:8px;opacity:.8}
+.panel{position:relative;transition:background .2s}
+.panel.flash-ok{background:#d9ecd9}.panel.flash-no{background:#f3d2cc;animation:tshake .35s}
+.float{position:absolute;left:50%;top:40%;transform:translateX(-50%);font-family:var(--f-display);font-size:30px;pointer-events:none;animation:floatup .9s ease-out forwards;white-space:nowrap}
+.float.ok{color:var(--green)}.float.no{color:var(--red)}
+@keyframes floatup{from{opacity:0;transform:translate(-50%,10px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.1)}to{opacity:0;transform:translate(-50%,-40px)}}
+.crit{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-family:var(--f-body);font-size:13.5px;font-weight:700}
+.crit li{opacity:.45}.crit li.ok{opacity:1;color:var(--green)}
+.score{text-align:center;font-family:var(--f-display);font-size:34px;line-height:1}
+.score span{font-variant-numeric:tabular-nums}
+.achs{display:flex;flex-direction:column;gap:5px}
+.achs span{background:#2a2018;color:var(--paper);border-radius:10px;padding:7px 10px;font-family:var(--f-body);font-weight:800;font-size:13px;animation:drop .5s .8s both}
+.achs b{color:var(--brass)}
+.achl{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.achl div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px;opacity:.5}
+.achl div.got{opacity:1;border-color:var(--brass)}
+.achl span{font-size:24px}.achl b{font-size:14px}.achl small{color:var(--mute);font-size:12px;line-height:1.3}
+</style>
 </head>
 <body>
 
@@ -300,7 +352,8 @@ body.ingame{overflow:hidden;height:100%}html:has(body.ingame){overflow:hidden}
   <div class="chapters" id="hCh"></div>
   <button class="daily" id="hDaily"><span>🗝️</span><span><b>Caso del día</b><small id="hDailyS">Un misterio nuevo cada día · +2 ☕</small></span></button>
   <div class="menu">
-    <button id="mHelp"><span>📖</span>Cómo jugar</button>
+    <button id="mHelp"><span>📖</span>Ayuda</button>
+    <button id="mAch"><span>🏆</span>Logros <small id="mAchN">0/12</small></button>
     <button id="mArch"><span>🗄️</span>Archivo</button>
     <button id="mSet"><span>⚙️</span>Ajustes</button>
   </div>
@@ -310,7 +363,7 @@ body.ingame{overflow:hidden;height:100%}html:has(body.ingame){overflow:hidden}
   <div class="gbar">
     <button class="back" id="gBack" aria-label="Volver">‹</button>
     <h2><small id="gCh">CAP. 1</small><span id="gTitle">Caso</span></h2>
-    <span class="timer" id="gTime">0:00</span>
+    <span class="candle" id="candleWrap"><i id="candle"></i><span class="timer" id="gTime">0:00</span></span>
     <button class="ibtn" id="tUndo" aria-label="Deshacer">↶</button>
     <button class="ibtn" id="tAsk" aria-label="Interrogar">☕<b id="askN">3</b></button>
     <button class="ibtn" id="tMore" aria-label="Más opciones">⋯</button>
@@ -521,7 +574,7 @@ function genCase(level,seedStr){
 
 // ===================== ESTADO =====================
 const KEY='mansion-medianoche-v1';
-const DEF={level:1,solved:0,stars:0,coffee:3,sound:true,rain:false,streak:{last:'',count:0},daily:{},dailyLvl:{},ip:{},seenCh:{},archive:[],seenHelp:false};
+const DEF={level:1,solved:0,stars:0,pts:0,coffee:3,sound:true,music:true,rain:false,streak:{last:'',count:0},daily:{},dailyLvl:{},ip:{},seenCh:{},archive:[],seenHelp:false,ach:{},noCoffeeRun:0};
 let S;try{S=Object.assign(structuredClone(DEF),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){S=structuredClone(DEF)}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 const $=s=>document.querySelector(s);
@@ -531,35 +584,78 @@ const yesterday=()=>{const d=new Date();d.setDate(d.getDate()-1);return dstr(d)}
 for(const k of Object.keys(S.ip))if(k.startsWith('D')&&k!=='D'+today())delete S.ip[k];
 const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
 const strip=h=>h.replace(/<[^>]+>/g,'');
+const rint=n=>Math.floor(Math.random()*n);
 
-const RCOL=['#cdb88c','#9db98d','#b4a2c9','#d09b85','#8db2c7','#c7bd72'];
+// ===================== ESCENARIOS =====================
+const R=(n,i,a)=>({n,in:i,a});
+const LOCS={
+ mansion:{n:'La Mansión',ico:'🏚️',pal:['#cdb88c','#9db98d','#b4a2c9','#d09b85','#8db2c7','#c7bd72'],
+  rooms:[R('Cocina','en la cocina','la cocina'),R('Salón','en el salón','el salón'),R('Biblioteca','en la biblioteca','la biblioteca'),R('Baño','en el baño','el baño'),R('Dormitorio','en el dormitorio','el dormitorio'),R('Jardín','en el jardín','el jardín'),R('Estudio','en el estudio','el estudio'),R('Bodega','en la bodega','la bodega'),R('Invernadero','en el invernadero','el invernadero'),R('Desván','en el desván','el desván')],
+  obj:{plant:['🪴','una planta','ninguna planta'],shelf:['📚','una estantería','ninguna estantería'],table:['🍽️','una mesa','ninguna mesa']},chair:['🪑','una silla','silla'],
+  titles:['El último brindis de {V}','Silencio en casa de {V}','Una cena mortal para {V}','{V} no llegó al postre','La noche en que cayó {V}','El testamento de {V}','Tormenta sobre la mansión','Nadie oyó gritar a {V}']},
+ tren:{n:'Expreso de Medianoche',ico:'🚂',pal:['#c9a27a','#8fae9c','#b9928f','#98a3bf','#c4b37a','#a7b98c'],
+  rooms:[R('Vagón restaurante','en el vagón restaurante','el vagón restaurante'),R('Coche cama','en el coche cama','el coche cama'),R('Equipajes','en el vagón de equipajes','el vagón de equipajes'),R('Locomotora','en la locomotora','la locomotora'),R('Vagón bar','en el vagón bar','el vagón bar'),R('Mirador','en el mirador','el mirador'),R('Correo','en el furgón de correo','el furgón de correo'),R('Compartimento 7','en el compartimento 7','el compartimento 7'),R('Revisor','en la cabina del revisor','la cabina del revisor'),R('Primera clase','en primera clase','primera clase')],
+  obj:{plant:['🧳','una maleta','ninguna maleta'],shelf:['📦','una caja de carga','ninguna caja'],table:['🍽️','una mesa','ninguna mesa']},chair:['💺','un asiento','asiento'],
+  titles:['Muerte en el Expreso de Medianoche','{V} no llegó a la última estación','Billete sin vuelta para {V}','El túnel donde calló {V}','Parada final: {V}','Niebla en los raíles']},
+ hotel:{n:'Hotel Nevado',ico:'🏔️',pal:['#b7c9d6','#c9b7d6','#d6c3a5','#a9cfc2','#d6aeb0','#c8d0a0'],
+  rooms:[R('Recepción','en la recepción','la recepción'),R('Spa','en el spa','el spa'),R('Suite 101','en la suite 101','la suite 101'),R('Cocina','en la cocina','la cocina'),R('Bar','en el bar','el bar'),R('Calderas','en la sala de calderas','la sala de calderas'),R('Biblioteca','en la biblioteca','la biblioteca'),R('Gimnasio','en el gimnasio','el gimnasio'),R('Terraza','en la terraza','la terraza'),R('Lavandería','en la lavandería','la lavandería')],
+  obj:{plant:['🎄','un abeto','ningún abeto'],shelf:['🧺','un carro de toallas','ningún carro de toallas'],table:['🍽️','una mesa','ninguna mesa']},chair:['🪑','una silla','silla'],
+  titles:['Nieve roja en el Hotel Nevado','{V} no bajó a desayunar','La última noche de {V}','Ventisca y silencio','Habitación 101','El huésped que no despertó']},
+ teatro:{n:'Gran Teatro',ico:'🎭',pal:['#d4a3a3','#a3b5d4','#d4c48f','#a9c9a0','#c2a3d4','#d4b08f'],
+  rooms:[R('Escenario','en el escenario','el escenario'),R('Camerino','en el camerino','el camerino'),R('Platea','en la platea','la platea'),R('Foso','en el foso','el foso'),R('Taquilla','en la taquilla','la taquilla'),R('Bambalinas','entre bambalinas','las bambalinas'),R('Palco','en el palco','el palco'),R('Vestuario','en el vestuario','el vestuario'),R('Ensayo','en la sala de ensayo','la sala de ensayo'),R('Telar','en el telar','el telar')],
+  obj:{plant:['🎹','un piano','ningún piano'],shelf:['🪜','una escalera','ninguna escalera'],table:['🎭','un decorado','ningún decorado']},chair:['💺','una butaca','butaca'],
+  titles:['Último acto para {V}','{V} no salió a saludar','Telón para {V}','Función de medianoche','El fantasma del palco','Aplausos para un cadáver']}};
+const LORDER=['mansion','tren','hotel','teatro'];
+function locKey(lvl,key){if(key.startsWith('D'))return LORDER[hashStr(key)%4];const c=chapterOf(lvl).id;
+  if(c<=2)return'mansion';if(c===3)return'tren';if(c===4)return'hotel';return LORDER[Math.floor(lvl/5)%4]}
+const MOTIVES=['por la herencia','para ocultar un secreto de juventud','por celos','por una deuda de juego','por un cuadro robado','por una carta comprometedora','para quedarse con la empresa','por una venganza de hace veinte años','porque lo sabía todo','por un collar de perlas'];
 const RANKS=[['Becario',0,'🔎'],['Agente',3,'🕵️'],['Sargento',10,'🎖️'],['Inspector',20,'🔦'],['Comisario',35,'⭐'],['Leyenda',60,'👑']];
 const CH={
- 1:{n:'La cena',s:'Lo básico',intro:`<div class="demo">🧔 👩‍🦰 💀</div>
+ 1:{n:'La cena',s:'Básico',intro:`<div class="demo">🧔 👩‍🦰 💀</div>
    <ul class="rules"><li>Cada persona estaba en <b>una fila y una columna distintas</b>. La víctima 💀 también.</li>
-   <li>Nadie puede estar encima de 🪴 📚 🍽️. En 🪑 sillas y alfombras sí.</li>
-   <li>Las declaraciones y el informe forense te dicen dónde estaba cada uno.</li>
-   <li>El culpable es el <b>único sospechoso que estuvo a solas con la víctima</b> en su habitación.</li></ul>`},
- 2:{n:'El culpable miente',s:'Mentiras',intro:`<div class="demo">🤥 ➜ 🔪</div>
-   <ul class="rules"><li>A partir de ahora: <b>los inocentes dicen siempre la verdad</b>. El culpable <b>miente en todo</b> lo que declara.</li>
+   <li>Nadie puede estar encima de muebles grandes (🪴 📚 🍽️). En sillas 🪑 y alfombras sí.</li>
+   <li>Toca o <b>arrastra</b> a cada sospechoso al plano. El punto 🟢/🔴 de su ficha dice si lo que declara cuadra.</li>
+   <li>El culpable es el <b>único sospechoso a solas con la víctima</b> en su habitación.</li>
+   <li>🕯️ Resuelve antes de que se apague la vela para ganar la tercera estrella.</li></ul>`},
+ 2:{n:'El culpable miente',s:'Mentiras',intro:`<div class="demo">🤥 ➜ 🔥</div>
+   <ul class="rules"><li>Desde ahora: <b>los inocentes dicen la verdad</b> y el culpable <b>miente en todo</b>.</li>
    <li>El informe forense nunca miente.</li>
-   <li>Toca el sello de un sospechoso para marcarlo como <b>MIENTE</b>: sus frases se comprobarán al revés.</li>
-   <li>Si alguien mezcla verdades y mentiras, lo tienes mal colocado: nadie hace eso.</li></ul>`},
- 3:{n:'Puertas',s:'Puertas',intro:`<div class="demo">🚪</div>
-   <ul class="rules"><li>Las líneas doradas en las paredes son <b>puertas</b> entre habitaciones.</li>
-   <li>Algunos dirán cosas como «mi habitación tenía una puerta que daba a la cocina». Si no hay puerta dorada entre esas dos habitaciones, no pudo estar ahí… o está mintiendo.</li></ul>`},
- 4:{n:'Huellas',s:'Huellas',intro:`<div class="demo">👣</div>
-   <ul class="rules"><li>La policía ha marcado <b>huellas 👣</b> en el plano.</li>
-   <li>En cada casilla con huellas <b>estuvo exactamente una persona</b>. No sabes quién: eso lo deduces tú.</li></ul>`},
- 5:{n:'Casos maestros',s:'Maestro',intro:`<div class="demo">🎻 🕯️ 🍷</div>
-   <ul class="rules"><li>Todo junto: mentiras, puertas y huellas.</li><li>Cada 10 casos, una mansión gigante de 7×7.</li></ul>`}};
+   <li>Pon el sello <b>MIENTE</b> a quien sospeches: sus frases se comprobarán al revés.</li>
+   <li>Quien mezcla verdad y mentira está mal colocado: nadie hace eso.</li>
+   <li>🔥 Al pillarlo llega <b>¡PROTESTO!</b>: se defiende a contrarreloj y tú desmontas sus mentiras mirando el plano.</li></ul>`},
+ 3:{n:'Expreso de Medianoche',s:'Tren',intro:`<div class="demo">🚂 🚪</div>
+   <ul class="rules"><li>Nuevo escenario: un tren nocturno.</li><li>Las líneas doradas son <b>puertas</b> entre vagones.</li>
+   <li>Si alguien dice «mi vagón tenía una puerta al mirador» y no hay puerta dorada entre ambos, no pudo estar ahí… o miente.</li></ul>`},
+ 4:{n:'Hotel Nevado',s:'Hotel',intro:`<div class="demo">🏔️ 👣</div>
+   <ul class="rules"><li>Nuevo escenario: un hotel aislado por la nieve.</li>
+   <li>La policía ha marcado <b>huellas 👣</b>: en cada casilla con huellas <b>estuvo exactamente una persona</b>. Quién, lo deduces tú.</li></ul>`},
+ 5:{n:'Gira final',s:'Final',intro:`<div class="demo">🏚️ 🚂 🏔️ 🎭</div>
+   <ul class="rules"><li>Todo junto: mentiras, puertas y huellas.</li><li>Los escenarios rotan y aparece el <b>Gran Teatro</b>.</li><li>Cada 10 casos, un escenario gigante de 7×7.</li></ul>`}};
+const ACH=[
+ ['primer','🔍','Primer caso','Cierra tu primer caso'],
+ ['perfecto','⭐','Impecable','Consigue las 3 estrellas'],
+ ['rapido','⚡','Relámpago','Resuelve un caso en menos de 60 s'],
+ ['protesto','🔥','¡Protesto!','Desmonta todas las mentiras de un culpable'],
+ ['sincafe','☕','A pelo','5 casos seguidos sin café'],
+ ['noche','🌙','Insomne','Cierra un caso entre las 0:00 y las 5:00'],
+ ['racha3','📅','Constante','3 días seguidos con el caso del día'],
+ ['tren','🚂','Billete','Llega al Expreso de Medianoche'],
+ ['hotel','🏔️','Huésped','Llega al Hotel Nevado'],
+ ['teatro','🎭','Estreno','Resuelve un caso en el Gran Teatro'],
+ ['diez','🗄️','Archivo lleno','Cierra 10 casos'],
+ ['cincuenta','👑','Leyenda viva','Cierra 50 casos']];
 
-// ===================== SONIDO =====================
-let AC,rainNode=null;
+// ===================== SONIDO / MÚSICA =====================
+let AC,rainNode=null,echo=null;
 function ac(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function out(){const a=ac();if(!echo){const d=a.createDelay(),fb=a.createGain(),wet=a.createGain();d.delayTime.value=.32;fb.gain.value=.35;wet.gain.value=.4;d.connect(fb).connect(d);d.connect(wet).connect(a.destination);echo=d}return echo}
 function tone(f,d=.08,type='sine',v=.07,delay=0){if(!S.sound)return;const a=ac();if(!a)return;
   const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
   g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.03)}
+function piano(f,v=.05,delay=0){const a=ac();if(!a)return;const t=a.currentTime+delay;
+  [1,2,3].forEach((h,k)=>{const o=a.createOscillator(),g=a.createGain();o.type=k?'sine':'triangle';o.frequency.value=f*h;
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v/(h*h),t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+2.4/h);
+    o.connect(g);g.connect(a.destination);g.connect(out());o.start(t);o.stop(t+2.5)})}
 function noiseBurst(d,freq,v){const a=ac();if(!a||!S.sound)return;const len=a.sampleRate*d,b=a.createBuffer(1,len,a.sampleRate),x=b.getChannelData(0);
   for(let i=0;i<len;i++)x[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
   const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;f.type='lowpass';f.frequency.value=freq;g.gain.value=v;s.connect(f).connect(g).connect(a.destination);s.start()}
@@ -567,24 +663,34 @@ const sfx={
   tap:()=>tone(620,.05,'triangle',.04),
   mark:()=>noiseBurst(.05,3000,.12),
   place:()=>{noiseBurst(.07,900,.35);tone(196,.12,'sine',.08)},
+  good:()=>{tone(784,.08,'triangle',.05);tone(1175,.12,'triangle',.05,.07)},
   bad:()=>{tone(110,.35,'sawtooth',.05);tone(104,.4,'sawtooth',.04,.05)},
   stamp:()=>{noiseBurst(.12,600,.7);tone(80,.1,'sine',.15)},
   type:()=>noiseBurst(.025,4000,.06),
   thunder:()=>noiseBurst(1.8,300,.9),
-  win:()=>[392,494,587,784].forEach((f,i)=>tone(f,.4,'triangle',.06,i*.14))};
-function setRain(on){S.rain=on;save();$('#rain').classList.toggle('on',on);$('#gRain').classList.toggle('on',on);
+  tick:()=>tone(1400,.03,'square',.02),
+  win:()=>{if(!S.sound)return;[220,261.6,329.6,440].forEach((f,i)=>piano(f,.07,i*.12))},
+  coin:()=>{tone(988,.06,'square',.03);tone(1319,.14,'square',.03,.06)}};
+let musicT=null;
+const SCALE=[110,130.81,146.83,164.81,196,220,261.63,293.66];
+function music(){clearInterval(musicT);musicT=null;if(!S.music||!S.sound)return;let step=0;
+  musicT=setInterval(()=>{if(document.hidden||!S.music||!S.sound||!AC)return;step++;
+    if(Math.random()<.75)piano(SCALE[rint(SCALE.length)],.035);if(step%4===1)piano(55,.05);if(step%8===5)piano(SCALE[rint(4)]*2,.02,.35)},1500)}
+function setRain(on){S.rain=on;save();$('#rain').classList.toggle('on',on);
   const a=ac();if(!a)return;
   if(on&&!rainNode){const len=a.sampleRate*2,b=a.createBuffer(1,len,a.sampleRate),x=b.getChannelData(0);let last=0;
     for(let i=0;i<len;i++){last=(last+.04*(Math.random()*2-1))/1.04;x[i]=last*3+(Math.random()*2-1)*.08}
-    const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;s.loop=true;f.type='lowpass';f.frequency.value=1400;g.gain.value=.35;
+    const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;s.loop=true;f.type='lowpass';f.frequency.value=1400;g.gain.value=.3;
     s.connect(f).connect(g).connect(a.destination);s.start();rainNode={s,g}}
   else if(!on&&rainNode){try{rainNode.s.stop()}catch(e){}rainNode=null}}
 function lightning(){const f=$('#flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');setTimeout(sfx.thunder,250)}
+let audioStarted=false;
+document.addEventListener('pointerdown',()=>{if(audioStarted)return;audioStarted=true;ac();music();if(S.rain)setRain(true)},{capture:true});
 
 let toastT;function toast(m,ms=2600){const t=$('#toast');t.innerHTML=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms)}
 
 // ===================== MODAL =====================
-let lock=false;
+let lock=false,typer;
 function openModal(html,{paper=false,locked=false}={}){const s=$('#sheet');s.className='sheet'+(paper?' paper':'');s.innerHTML=html;$('#modal').hidden=false;lock=locked}
 function closeModal(){$('#modal').hidden=true;clearInterval(typer)}
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal'&&!lock)closeModal()});
@@ -594,18 +700,20 @@ const A={close:closeModal};
 // ===================== HOME =====================
 function rankOf(n){let r=RANKS[0],nx=null;for(let i=0;i<RANKS.length;i++)if(n>=RANKS[i][1]){r=RANKS[i];nx=RANKS[i+1]||null}return{r,nx}}
 function streakNow(){return(S.streak.last===today()||S.streak.last===yesterday())?S.streak.count:0}
+function caseTitle(cs,lk,key){const L=LOCS[lk];return L.titles[hashStr(key+'t')%L.titles.length].replace('{V}',cs.victim)}
 function renderHome(){
   $('#hCoffee').textContent='☕ '+S.coffee;$('#hStreak').textContent='🔥 '+streakNow()+' días';
   const {r,nx}=rankOf(S.solved),pct=nx?Math.round((S.solved-r[1])/(nx[1]-r[1])*100):100;
-  $('#hRank').innerHTML=`<span class="badge">${r[2]}</span><span class="bar"><b>${r[0]}</b><small>${S.solved} casos cerrados · ${S.stars} ⭐${nx?' · '+(nx[1]-S.solved)+' para '+nx[0]:''}</small><div class="meter"><i style="width:${pct}%"></i></div></span>`;
-  const cs=genCase(S.level,'L'+S.level),ch=chapterOf(S.level);
-  $('#hNo').textContent='EXPEDIENTE Nº '+S.level;
-  $('#hTitle').textContent=cs.title;
-  $('#hDesc').textContent=`Capítulo ${ch.id}: ${CH[ch.id].n}. ${cs.n-1} sospechosos, ${cs.k} habitaciones, una víctima.`;
-  $('#hBtn').textContent=S.ip['L'+S.level]?'CONTINUAR INVESTIGACIÓN':'ABRIR EXPEDIENTE';
+  $('#hRank').innerHTML=`<span class="badge">${r[2]}</span><span class="bar"><b>${r[0]}</b><small>${S.solved} casos · ${S.stars} ⭐ · ${S.pts.toLocaleString('es-ES')} pts${nx?' · '+(nx[1]-S.solved)+' para '+nx[0]:''}</small><div class="meter"><i style="width:${pct}%"></i></div></span>`;
+  const key='L'+S.level,cs=genCase(S.level,key),ch=chapterOf(S.level),lk=locKey(S.level,key),L=LOCS[lk];
+  $('#hNo').textContent='EXPEDIENTE Nº '+S.level+' · '+L.ico+' '+L.n.toUpperCase();
+  $('#hTitle').textContent=caseTitle(cs,lk,key);
+  $('#hDesc').textContent=`Capítulo ${ch.id}: ${CH[ch.id].n}. ${cs.n-1} sospechosos, ${cs.k} estancias, una víctima.`;
+  $('#hBtn').textContent=S.ip[key]?'CONTINUAR INVESTIGACIÓN':'ABRIR EXPEDIENTE';
   $('#hCh').innerHTML=[1,2,3,4,5].map(i=>`<div class="${i===ch.id?'cur':i>ch.id?'lock':''}"><b>${i>ch.id?'🔒':i}</b>${CH[i].s}</div>`).join('');
   const dn=S.daily[today()];$('#hDaily').classList.toggle('done',!!dn);
   $('#hDailyS').textContent=dn?'✓ Resuelto hoy. Vuelve mañana':'Un misterio nuevo cada día · +2 ☕';
+  const got=ACH.filter(a=>S.ach[a[0]]).length;$('#mAchN').textContent=got+'/'+ACH.length;
 }
 function show(id){$('#home').hidden=id!=='home';$('#game').hidden=id!=='game';document.body.classList.toggle('ingame',id==='game');scrollTo(0,0);if(id==='home')renderHome()}
 
@@ -615,86 +723,93 @@ const V=()=>G.cs.n-1;
 const nm=p=>p===V()?G.cs.victim:SUSP[G.cs.people[p]].n;
 const em=p=>p===V()?'💀':SUSP[G.cs.people[p]].e;
 const gd=p=>SUSP[G.cs.people[p]].g;
-const RM=q=>ROOMS[G.cs.roomIds[q]];
-function sText(cl){const g=cl.p===V()?'a':gd(cl.p),Q=cl.q!=null?`<b>${nm(cl.q)}</b>`:'',o=OBJ[cl.v];
+const LOC=()=>LOCS[G.lk];
+const RM=q=>LOC().rooms[G.cs.roomIds[q]];
+const OB=t=>{const o=LOC().obj[t];return{e:o[0],a:o[1],no:o[2]}};
+const objEmoji=t=>t==='chair'?LOC().chair[0]:t==='rug'?'':OB(t).e;
+function sText(cl,pp){const p=pp??cl.p,g=p===V()?'a':gd(p),Q=cl.q!=null?`<b>${nm(cl.q)}</b>`:'',ch=LOC().chair;
   switch(cl.t){
     case 'room':return`Estuve ${RM(cl.v).in} toda la noche.`;
     case 'nroom':return`En ningún momento pisé ${RM(cl.v).a}.`;
-    case 'on':return cl.v==='chair'?`Estuve sentad${g} en una silla 🪑.`:`Estuve de pie sobre una alfombra.`;
-    case 'next':return`Tenía ${o.a} ${o.e} justo al lado (no en diagonal).`;
-    case 'nnext':return`No tenía ${o.no} ${o.e} al lado.`;
+    case 'on':return cl.v==='chair'?`Estuve sentad${g} en ${ch[1]} ${ch[0]}.`:`Estuve de pie sobre una alfombra.`;
+    case 'next':{const o=OB(cl.v);return`Tenía ${o.a} ${o.e} justo al lado (no en diagonal).`}
+    case 'nnext':{const o=OB(cl.v);return`No tenía ${o.no} ${o.e} al lado.`}
     case 'top':return`Estaba en la fila de más arriba.`;
     case 'bottom':return`Estaba en la fila de más abajo.`;
     case 'left':return`Estaba pegad${g} a la pared izquierda.`;
     case 'right':return`Estaba pegad${g} a la pared derecha.`;
-    case 'corner':return`Estaba en una esquina de la casa.`;
+    case 'corner':return`Estaba en una esquina.`;
     case 'row':return`Estaba en la fila ${cl.v+1}, contando desde arriba.`;
     case 'col':return`Estaba en la columna ${cl.v+1}, contando desde la izquierda.`;
-    case 'same':return`Estuve en la misma habitación que ${Q}.`;
-    case 'diff':return`No estuve en la misma habitación que ${Q}.`;
+    case 'same':return`Estuve en la misma estancia que ${Q}.`;
+    case 'diff':return`No estuve en la misma estancia que ${Q}.`;
     case 'above':return`Estaba en una fila más arriba que ${Q}.`;
     case 'leftof':return`Estaba en una columna más a la izquierda que ${Q}.`;
-    case 'door':return`Mi habitación tenía una puerta que daba a ${RM(cl.v).a}.`;
+    case 'door':return`Donde yo estaba había una puerta que daba a ${RM(cl.v).a}.`;
+    case 'alone':return`Nunca estuve a solas con ${G.cs.victim}.`;
   }return''}
-function fText(cl){const o=OBJ[cl.v];
+function fText(cl){const ch=LOC().chair;
   switch(cl.t){
     case 'room':return`El cuerpo apareció ${RM(cl.v).in}.`;
     case 'nroom':return`El cuerpo no estaba ${RM(cl.v).in}.`;
-    case 'on':return cl.v==='chair'?`La víctima estaba sentada en una silla 🪑.`:`El cuerpo estaba sobre una alfombra.`;
-    case 'next':return`Había ${o.a} ${o.e} justo al lado del cuerpo.`;
-    case 'nnext':return`No había ${o.no} ${o.e} al lado del cuerpo.`;
+    case 'on':return cl.v==='chair'?`La víctima estaba sentada en ${ch[1]} ${ch[0]}.`:`El cuerpo estaba sobre una alfombra.`;
+    case 'next':{const o=OB(cl.v);return`Había ${o.a} ${o.e} justo al lado del cuerpo.`}
+    case 'nnext':{const o=OB(cl.v);return`No había ${o.no} ${o.e} al lado del cuerpo.`}
     case 'top':return`El cuerpo estaba en la fila de más arriba.`;
     case 'bottom':return`El cuerpo estaba en la fila de más abajo.`;
     case 'left':return`El cuerpo estaba pegado a la pared izquierda.`;
     case 'right':return`El cuerpo estaba pegado a la pared derecha.`;
-    case 'corner':return`El cuerpo estaba en una esquina de la casa.`;
+    case 'corner':return`El cuerpo estaba en una esquina.`;
     case 'row':return`El cuerpo estaba en la fila ${cl.v+1}.`;
     case 'col':return`El cuerpo estaba en la columna ${cl.v+1}.`;
     case 'empty':return`Nadie entró ${RM(cl.v).in} en toda la noche.`;
   }return''}
 
+function parTime(n){return n*n*7}
 function startCase(kind){
   let lvl,key;
   if(kind==='daily'){const t=today();S.dailyLvl[t]=S.dailyLvl[t]||Math.max(5,Math.min(S.level,45));lvl=S.dailyLvl[t];key='D'+t}
   else{lvl=S.level;key='L'+lvl}
   const cs=genCase(lvl,key);cs.dp=new Set(cs.dp);
-  const n=cs.n,fresh=!S.ip[key];
-  const ip=S.ip[key]||{place:new Array(n).fill(-1),marks:[],stamps:new Array(n).fill(0),wrong:0,hints:0,time:0,phase:'solve',step:'who',ww:[],wx:[]};
-  G={kind,key,lvl,cs,place:ip.place.slice(),marks:new Set(ip.marks),stamps:ip.stamps.slice(),wrong:ip.wrong||0,hints:ip.hints,time:ip.time,
-     phase:ip.phase==='done'?'solve':ip.phase,step:ip.step||'who',ww:ip.ww||[],wx:ip.wx||[],sel:-1,view:0,lastSig:''};
+  const n=cs.n,fresh=!S.ip[key],lk=locKey(lvl,key);
+  const ip=S.ip[key]||{place:new Array(n).fill(-1),marks:[],stamps:new Array(n).fill(0),wrong:0,hints:0,time:0,phase:'solve',ww:[]};
+  G={kind,key,lvl,lk,cs,place:ip.place.slice(),marks:new Set(ip.marks),stamps:ip.stamps.slice(),wrong:ip.wrong||0,hints:ip.hints,time:ip.time,
+     phase:(ip.phase==='accuse')?'accuse':'solve',ww:ip.ww||[],sel:-1,view:0,lastSig:'',cf:null,candleOut:ip.time>parTime(n)};
+  G.title=caseTitle(cs,lk,key);
   undo=[];
-  $('#gCh').textContent=(kind==='daily'?'CASO DEL DÍA · ':'Nº '+lvl+' · ')+'CAP. '+cs.ch.id+' · '+CH[cs.ch.id].n.toUpperCase();
-  $('#gTitle').textContent=cs.title;
+  document.documentElement.style.setProperty('--rc0',LOC().pal[0]);
+  $('#gCh').textContent=(kind==='daily'?'CASO DEL DÍA':'Nº '+lvl)+' · '+LOC().ico+' '+LOC().n.toUpperCase();
+  $('#gTitle').textContent=G.title;
   build();paint();show('game');persist();
   if(!S.seenCh[cs.ch.id]){S.seenCh[cs.ch.id]=true;save();setTimeout(()=>chapterIntro(cs.ch.id),250)}
   else if(fresh)intro();
 }
 function intro(){const cs=G.cs,b=$('#banner');b.className='banner intro';b.hidden=false;
-  const txt=`🕯️ Medianoche.\n${cs.victim} ha aparecido sin vida.\n${cs.n-1} sospechosos. Nadie ha salido de la casa.`;
-  let i=0;b.innerHTML='<div><span id="itx"></span><small>Toca para empezar</small></div>';
-  const it=setInterval(()=>{i++;const el=$('#itx');if(!el){clearInterval(it);return}el.innerHTML=txt.slice(0,i).replace(/\n/g,'<br>');if(i%3===0)sfx.type();if(i>=txt.length)clearInterval(it)},30);
-  b.onclick=()=>{clearInterval(it);b.hidden=true;b.onclick=null};
-  setTimeout(()=>{if(!b.hidden&&b.classList.contains('intro')){}},0)}
+  const txt=`🕯️ Medianoche. ${LOC().n}.\n${cs.victim} ha aparecido sin vida.\nNadie ha salido de aquí.`;
+  let i=0;
+  b.innerHTML=`<div><span id="itx"></span><div class="lineup">${Array.from({length:cs.n-1},(_,p)=>`<span style="animation-delay:${1.6+p*.15}s">${em(p)}</span>`).join('')}</div><small>Toca para empezar</small></div>`;
+  const it=setInterval(()=>{i++;const el=$('#itx');if(!el){clearInterval(it);return}el.innerHTML=txt.slice(0,i).replace(/\n/g,'<br>');if(i%3===0)sfx.type();if(i>=txt.length)clearInterval(it)},28);
+  b.onclick=()=>{clearInterval(it);b.hidden=true;b.onclick=null}}
 function chapterIntro(id){openModal(`<div class="kicker">Capítulo ${id}</div><h2>${CH[id].n}</h2>${CH[id].intro}<button class="btn" data-act="close">A investigar</button>`,{paper:true})}
-function persist(){if(!G||G.phase==='done')return;S.ip[G.key]={place:G.place,marks:[...G.marks],stamps:G.stamps,wrong:G.wrong,hints:G.hints,time:G.time,phase:G.phase,step:G.step,ww:G.ww,wx:G.wx};save()}
+function persist(){if(!G||G.phase==='done'||G.phase==='confront')return;S.ip[G.key]={place:G.place,marks:[...G.marks],stamps:G.stamps,wrong:G.wrong,hints:G.hints,time:G.time,phase:G.phase,ww:G.ww};save()}
 
 function build(){
-  const cs=G.cs,n=cs.n,b=$('#board');b.style.setProperty('--n',n);b.className='board';b.innerHTML='';
+  const cs=G.cs,n=cs.n,b=$('#board'),pal=LOC().pal;b.style.setProperty('--n',n);b.className='board';b.innerHTML='';
   const thin='1px solid rgba(30,20,20,.14)',thick='3px solid var(--wall)';
   const feet=new Set(cs.clues.filter(c=>c.t==='foot').map(c=>c.v));
   for(let i=0;i<n*n;i++){const r=i/n|0,c=i%n,d=document.createElement('div');d.className='cell'+(cs.obj[i]==='rug'?' rug':'');d.dataset.i=i;
-    d.style.background=RCOL[cs.room[i]];
+    d.style.background=pal[cs.room[i]];
     if(r>0)d.style.borderTop=cs.room[i-n]!==cs.room[i]?thick:thin;
     if(c>0)d.style.borderLeft=cs.room[i-1]!==cs.room[i]?thick:thin;
-    const o=cs.obj[i];
-    d.innerHTML=(o==='rug'?'<span class="rugbg"></span>':'')+(o&&OBJ[o].e?`<span class="obj">${OBJ[o].e}</span>`:'')+(feet.has(i)?'<span class="ft">👣</span>':'')+'<span class="slot"></span>';
+    const o=cs.obj[i],oe=o?objEmoji(o):'';
+    d.innerHTML=(o==='rug'?'<span class="rugbg"></span>':'')+(oe?`<span class="obj">${oe}</span>`:'')+(feet.has(i)?'<span class="ft">👣</span>':'')+'<span class="slot"></span>';
     b.appendChild(d)}
   if(cs.ch.doors){const dv=document.createElement('div');dv.className='doors';
     dv.innerHTML=cs.doors.map(([i,j])=>{const r=i/n|0,c=i%n,u=100/n;
       return j===i+1?`<i class="door" style="left:calc(${(c+1)*u}% - 3.5px);top:${(r+.2)*u}%;width:7px;height:${.6*u}%"></i>`
                     :`<i class="door" style="top:calc(${(r+1)*u}% - 3.5px);left:${(c+.2)*u}%;height:7px;width:${.6*u}%"></i>`}).join('');
     b.appendChild(dv)}
-  $('#legend').innerHTML=cs.roomIds.map((id,q)=>`<span><i style="background:${RCOL[q]}"></i>${ROOMS[id].n} ${ROOMS[id].we}</span>`).join('');
+  $('#legend').innerHTML=cs.roomIds.map((id,q)=>`<span><i style="background:${pal[q]}"></i>${LOC().rooms[id].n}</span>`).join('');
 }
 function stmtState(cl){const tv=truthOf(cl,G.place,G.cs);if(tv==null)return'';
   const liar=cl.k==='t'&&G.stamps[cl.p]===1;return(liar?!tv:tv)?'ok':'no'}
@@ -705,7 +820,7 @@ function paint(){
   const cs=G.cs,n=cs.n,cells=cellsEl(),who=new Map();
   G.place.forEach((i,p)=>{if(i>=0)who.set(i,p)});
   const rc={},cc={};G.place.forEach(i=>{if(i<0)return;rc[i/n|0]=(rc[i/n|0]||0)+1;cc[i%n]=(cc[i%n]||0)+1});
-  $('#board').classList.toggle('accuse',G.phase==='accuse'&&G.step==='who');
+  $('#board').classList.toggle('accuse',G.phase==='accuse');
   cells.forEach((d,i)=>{const p=who.get(i),slot=d.querySelector('.slot');
     const s=p!=null?'p'+p+(G.ww.includes(p)?'i':''):G.marks.has(i)?'x':'';
     if(d.dataset.s!==s){d.dataset.s=s;slot.innerHTML=p!=null?`<span class="who${p===n-1?' v':''}${G.ww.includes(p)?' inno':''}">${em(p)}</span>`:s==='x'?'<span class="x">✕</span>':''}
@@ -716,28 +831,26 @@ function paint(){
     d.classList.toggle('taken',tk);d.classList.toggle('target',G.phase==='solve'&&G.sel>=0&&p==null&&!tk&&!isBlock(cs.obj[i]))});
   $('#tray').innerHTML=Array.from({length:n},(_,p)=>{const st=G.stamps[p],dot=dotOf(p);
     return`<button class="chip${p===n-1?' vict':''}${G.place[p]>=0?' placed':''}${G.sel===p?' sel':''}${G.view===p?' view':''}" data-p="${p}"><i class="dot ${dot}"></i><span>${em(p)}</span>${p===n-1?'Víctima':nm(p)}${st===1?'<i class="mk l">MIENTE</i>':st===2?'<i class="mk t">VERDAD</i>':''}</button>`}).join('');
-  $('#gTime').textContent=fmt(G.time);$('#askN').textContent=S.coffee;
-  renderPanel();
+  $('#askN').textContent=S.coffee;
+  paintCandle();renderPanel();
 }
+function paintCandle(){const par=parTime(G.cs.n),left=Math.max(0,1-G.time/par);
+  $('#candle').style.setProperty('--left',left);$('#gTime').textContent=fmt(G.time);
+  $('#candleWrap').classList.toggle('out',left<=0);$('#candleWrap').classList.toggle('low',left>0&&left<.2)}
 function lineHTML(cl,txt){const st=stmtState(cl);return`<div class="line ${st}"><span class="tx">${txt}</span><span class="st">${st==='ok'?'✓':st==='no'?'✕':''}</span></div>`}
 function renderPanel(){
-  const cs=G.cs,n=cs.n,P=$('#panel');
-  if(G.phase==='accuse'){
-    if(G.step==='who'){P.innerHTML=`<div class="kicker" style="text-align:left">Todo encaja</div>
-      <div class="ph"><span class="av">🔪</span><span class="nm">¿Quién lo hizo?<small>Mira el plano con calma</small></span></div>
-      <p class="hint2">El culpable es el <b>único sospechoso a solas con ${cs.victim}</b> en su habitación. Cuando lo tengas, <b>tócalo en el plano</b>.</p>
-      ${G.ww.length?`<p class="hint2">Descartados: ${G.ww.map(p=>em(p)+' '+nm(p)).join(', ')}</p>`:''}`}
-    else{const k=cs.murderer,r=cs.room[cs.pos[k]];
-      P.innerHTML=`<div class="kicker" style="text-align:left">Culpable: ${nm(k)}</div>
-      <div class="ph"><span class="av">${em(k)}</span><span class="nm">¿Con qué lo hizo?<small>Cada habitación tiene su arma (mira la leyenda)</small></span></div>
-      <div class="wopts">${cs.roomIds.map((id,q)=>`<button class="wopt${G.wx.includes(q)?' wrong':''}" data-w="${q}"><span>${ROOMS[id].we}</span>${ROOMS[id].w}</button>`).join('')}</div>`}
-    return}
+  const cs=G.cs,P=$('#panel');
+  if(G.phase==='confront'){renderConfront();return}
+  if(G.phase==='accuse'){P.innerHTML=`<div class="kicker" style="text-align:left">Todo encaja</div>
+      <div class="ph"><span class="av">🔪</span><span class="nm">¿Quién lo hizo?<small>Mira el plano con calma: no hay prisa</small></span></div>
+      <p class="hint2">El culpable es el <b>único sospechoso a solas con ${cs.victim}</b> en su estancia. Cuando lo tengas, <b>tócalo en el plano</b>.</p>
+      ${G.ww.length?`<p class="hint2">Con coartada: ${G.ww.map(p=>em(p)+' '+nm(p)).join(', ')}</p>`:''}`;return}
   const p=G.view;
   if(p===V()){
     const fz=cs.clues.filter(c=>c.k==='f'&&c.t!=='foot'),feet=cs.clues.filter(c=>c.t==='foot');
     const fs=feet.map(stmtState),fst=fs.includes('no')?'no':fs.length&&fs.every(x=>x==='ok')?'ok':'';
     P.innerHTML=`<div class="ph"><span class="av">💀</span><span class="nm">${cs.victim}<small>Informe forense · nunca miente</small></span></div>
-      ${G.sel===p?'<p class="hint2">Toca en el plano dónde apareció el cuerpo.</p>':''}
+      ${G.sel===p?'<p class="hint2">Toca en el plano dónde apareció el cuerpo (o arrástralo).</p>':''}
       ${fz.map(c=>lineHTML(c,fText(c))).join('')}
       ${feet.length?`<div class="line ${fst}"><span class="tx">Huellas 👣 en ${feet.length===1?'una casilla':feet.length+' casillas'}: en cada una estuvo alguien.</span><span class="st">${fst==='ok'?'✓':fst==='no'?'✕':''}</span></div>`:''}
       <div class="rule">🔪 El culpable es el <b>único sospechoso a solas con la víctima</b>.${cs.ch.liar?'<br>🤥 Los inocentes dicen la verdad. <b>El culpable miente en todo.</b>':''}<br>📐 Una persona por fila y por columna.</div>`;
@@ -747,136 +860,231 @@ function renderPanel(){
     if(tv.every(x=>x))verdict=`<div class="verdict good" style="margin-left:0">Todo lo que dice cuadra.</div>`;
     else if(tv.every(x=>!x))verdict=`<div class="verdict ${cs.ch.liar?'good':'bad'}" style="margin-left:0">${cs.ch.liar?'Todo lo que dice es falso… ¿será el culpable?':'Nada cuadra: revisa dónde lo has puesto.'}</div>`;
     else verdict=`<div class="verdict bad" style="margin-left:0">Mezcla verdad y mentira. Nadie hace eso: algo está mal colocado.</div>`}
+  const o=gd(p)==='a'?'a':'o';
   P.innerHTML=`<div class="ph"><span class="av">${em(p)}</span><span class="nm">${nm(p)}<small>${SUSP[cs.people[p]].j}</small></span>
     ${cs.ch.liar?`<button class="seal ${st===1?'l':st===2?'t':''}" data-seal="${p}">${st===1?'MIENTE':st===2?'VERDAD':'SIN SELLO'}</button>`:''}</div>
-    <p class="hint2">${G.sel===p?'Toca en el plano dónde estaba.':G.place[p]>=0?'Colocad'+gd(p)+'. Toca su ficha en el plano para moverl'+(gd(p)==='a'?'a':'o')+'.':'Tócal'+(gd(p)==='a'?'a':'o')+' otra vez abajo para colocarl'+(gd(p)==='a'?'a':'o')+'.'}</p>
+    <p class="hint2">${G.sel===p?'Toca en el plano dónde estaba, o arrástral'+o+'.':G.place[p]>=0?'Colocad'+o+'. Arrastra su ficha para moverl'+o+'.':'Arrástral'+o+' al plano o tócal'+o+' otra vez.'}</p>
     ${mine.map(c=>lineHTML(c,`<span class="quote">${sText(c)}</span>`)).join('')}${verdict}`;
 }
 function snap(){undo.push({place:G.place.slice(),marks:[...G.marks]});if(undo.length>200)undo.shift()}
-$('#tray').addEventListener('click',e=>{const c=e.target.closest('.chip');if(!c||!G)return;const p=+c.dataset.p;
-  if(G.phase!=='solve'){G.view=p;sfx.tap();paint();return}
-  if(G.view===p&&G.sel===p){G.sel=-1}else{G.view=p;G.sel=p}
-  sfx.tap();paint();$('#panel').scrollTop=0});
-$('#panel').addEventListener('click',e=>{if(!G)return;
-  const s=e.target.closest('[data-seal]');if(s){const p=+s.dataset.seal;G.stamps[p]=(G.stamps[p]+1)%3;sfx.stamp();paint();persist();return}
-  const w=e.target.closest('[data-w]');if(w&&G.phase==='accuse'&&G.step==='weapon')pickWeapon(+w.dataset.w)});
 function shakeToken(p){const i=G.place[p];if(i<0)return;const t=cellsEl()[i].querySelector('.who');if(!t)return;t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}
-$('#board').addEventListener('click',e=>{
-  const cell=e.target.closest('.cell');if(!cell||!G)return;ac();
+
+// ---- colocar (tocar o arrastrar) ----
+function placeAt(p,i){const cs=G.cs;
+  if(isBlock(cs.obj[i])){toast(`Nadie puede estar encima de ${OB(cs.obj[i]).a} ${OB(cs.obj[i]).e}`);sfx.bad();G.sel=-1;paint();return}
+  snap();const q=G.place.indexOf(i),from=G.place[p];
+  if(q>=0&&q!==p)G.place[q]=from>=0?from:-1;
+  G.place[p]=i;G.marks.delete(i);G.view=p;G.sel=-1;sfx.place();
+  paint();const d=dotOf(p);if(d==='no')setTimeout(()=>{shakeToken(p);tone(150,.12,'square',.03)},120);else if(d==='ok')sfx.good();
+  persist();check()}
+let suppress=false,drag=null;
+$('#tray').addEventListener('click',e=>{if(suppress)return;const c=e.target.closest('.chip');if(!c||!G)return;const p=+c.dataset.p;
+  if(G.phase!=='solve'){G.view=p;sfx.tap();paint();return}
+  if(G.view===p&&G.sel===p)G.sel=-1;else{G.view=p;G.sel=p}
+  sfx.tap();paint();$('#panel').scrollTop=0});
+$('#board').addEventListener('click',e=>{if(suppress)return;
+  const cell=e.target.closest('.cell');if(!cell||!G)return;
   const i=+cell.dataset.i,cs=G.cs,q=G.place.indexOf(i);
-  if(G.phase==='accuse'){if(G.step==='who'&&q>=0&&q!==V())accuseWho(q);return}
+  if(G.phase==='accuse'){if(q>=0&&q!==V())accuseWho(q);return}
   if(G.phase!=='solve')return;
   if(q>=0){
-    if(G.sel===-1){G.sel=q;G.view=q;sfx.tap()}
-    else if(G.sel===q){snap();G.place[q]=-1;G.sel=-1;sfx.mark()}
-    else{snap();const mv=G.sel;G.place[q]=-1;G.place[mv]=i;G.view=mv;G.sel=-1;sfx.place();afterPlace(mv)}
-  }else if(G.sel>=0){
-    if(isBlock(cs.obj[i])){toast(`Nadie puede estar encima de ${OBJ[cs.obj[i]].a} ${OBJ[cs.obj[i]].e}`);sfx.bad();return}
-    snap();const mv=G.sel;G.place[mv]=i;G.marks.delete(i);G.view=mv;G.sel=-1;sfx.place();afterPlace(mv);
-  }else{if(isBlock(cs.obj[i]))return;snap();G.marks.has(i)?G.marks.delete(i):G.marks.add(i);sfx.mark()}
-  paint();persist();check()});
-function afterPlace(p){paint();if(dotOf(p)==='no'){setTimeout(()=>{shakeToken(p);tone(150,.12,'square',.03)},120)}
-  else if(dotOf(p)==='ok'){tone(880,.07,'triangle',.04,.05)}}
+    if(G.sel===-1){G.sel=q;G.view=q;sfx.tap();paint()}
+    else if(G.sel===q){snap();G.place[q]=-1;G.sel=-1;sfx.mark();paint();persist()}
+    else placeAt(G.sel,i);
+  }else if(G.sel>=0)placeAt(G.sel,i);
+  else{if(isBlock(cs.obj[i]))return;snap();G.marks.has(i)?G.marks.delete(i):G.marks.add(i);sfx.mark();paint();persist()}});
+function dragStart(e,p,from){if(!G||G.phase!=='solve')return;drag={p,from,x:e.clientX,y:e.clientY,id:e.pointerId,on:false,ghost:null}}
+$('#tray').addEventListener('pointerdown',e=>{const c=e.target.closest('.chip');if(c)dragStart(e,+c.dataset.p,'tray')});
+$('#board').addEventListener('pointerdown',e=>{const c=e.target.closest('.cell');if(!c||!G)return;const q=G.place.indexOf(+c.dataset.i);if(q>=0)dragStart(e,q,'board')});
+document.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;
+  const dx=e.clientX-drag.x,dy=e.clientY-drag.y;
+  if(!drag.on){if(Math.hypot(dx,dy)<9)return;if(drag.from==='tray'&&Math.abs(dx)>Math.abs(dy)*1.2){drag=null;return}
+    drag.on=true;const g=document.createElement('div');g.className='dragghost';g.textContent=em(drag.p);document.body.appendChild(g);drag.ghost=g;
+    G.sel=drag.p;G.view=drag.p;paint();sfx.tap()}
+  drag.ghost.style.transform=`translate(${e.clientX}px,${e.clientY}px)`;
+  const el=document.elementFromPoint(e.clientX,e.clientY),cell=el&&el.closest&&el.closest('#board .cell');
+  document.querySelectorAll('.cell.hover').forEach(c=>c!==cell&&c.classList.remove('hover'));if(cell)cell.classList.add('hover')});
+function dragEnd(e,cancel){if(!drag)return;const d=drag;drag=null;if(!d.on)return;
+  suppress=true;setTimeout(()=>suppress=false,60);d.ghost.remove();document.querySelectorAll('.cell.hover').forEach(c=>c.classList.remove('hover'));
+  const el=!cancel&&document.elementFromPoint(e.clientX,e.clientY),cell=el&&el.closest&&el.closest('#board .cell');
+  if(cell)placeAt(d.p,+cell.dataset.i);
+  else if(d.from==='board'&&!cancel){snap();G.place[d.p]=-1;G.sel=-1;sfx.mark();paint();persist()}
+  else{G.sel=-1;paint()}}
+document.addEventListener('pointerup',e=>dragEnd(e,false));
+document.addEventListener('pointercancel',e=>dragEnd(e,true));
+$('#panel').addEventListener('click',e=>{if(!G)return;
+  const s=e.target.closest('[data-seal]');if(s){const p=+s.dataset.seal;G.stamps[p]=(G.stamps[p]+1)%3;sfx.stamp();paint();persist();return}
+  const cf=e.target.closest('[data-cf]');if(cf){cfAnswer(cf.dataset.cf==='1');return}
+  if(e.target.closest('[data-cfgo]'))cfStart()});
+
 function check(){
   if(G.place.some(i=>i<0)){G.lastSig='';return}
   if(G.place.every((i,p)=>i===G.cs.pos[p])){
-    G.phase='accuse';G.step='who';G.sel=-1;persist();lightning();sfx.win();
+    G.phase='accuse';G.sel=-1;G.solveTime=G.time;persist();lightning();sfx.win();
     const b=$('#board');b.classList.add('allok');setTimeout(()=>b.classList.remove('allok'),900);
-    slam('TODO ENCAJA','Ahora mira bien el plano');paint();return}
+    slam('TODO ENCAJA','¿Quién estaba a solas con la víctima?');paint();return}
   const sig=G.place.join(',');if(sig!==G.lastSig){G.lastSig=sig;sfx.bad();
-    toast('Aún no encaja. Busca las fichas con punto rojo 🔴 y filas o columnas repetidas.',3200)}
-}
-function slam(t,sub){const b=$('#banner');b.className='banner';b.hidden=false;b.onclick=null;
-  b.innerHTML=`<div class="slam">${t}${sub?`<small>${sub}</small>`:''}</div>`;sfx.stamp();
-  setTimeout(()=>{const s=b.querySelector('.slam');if(s)s.classList.add('out')},1500);setTimeout(()=>{b.hidden=true},2000)}
+    toast('Aún no encaja. Mira las fichas con punto 🔴 y filas o columnas repetidas.',3000)}}
+function slam(t,sub,cls=''){const b=$('#banner');b.className='banner';b.hidden=false;b.onclick=null;
+  b.innerHTML=`<div class="slam ${cls}">${t}${sub?`<small>${sub}</small>`:''}</div>`;sfx.stamp();
+  clearTimeout(slam.t1);clearTimeout(slam.t2);
+  slam.t1=setTimeout(()=>{const s=b.querySelector('.slam');if(s)s.classList.add('out')},1500);slam.t2=setTimeout(()=>{b.hidden=true},2000)}
 function accuseWho(p){
   if(G.ww.includes(p))return;
-  if(p===G.cs.murderer){G.step='weapon';G.view=p;sfx.stamp();slam('¡CULPABLE!',nm(p));persist();paint();
-    setTimeout(()=>{const t=cellsEl()[G.cs.pos[p]].querySelector('.who');if(t)t.classList.add('killer')},50)}
+  if(p===G.cs.murderer){
+    const t=cellsEl()[G.cs.pos[p]].querySelector('.who');if(t)t.classList.add('killer');
+    slam('¡CULPABLE!',nm(p));
+    if(G.cs.ch.liar){G.phase='confront';G.cf=makeClaims();setTimeout(paint,600)}else setTimeout(()=>solved(null),1200)}
   else{G.ww.push(p);G.wrong++;lightning();shakeToken(p);toast(`${nm(p)} tiene coartada: no estaba a solas con la víctima.`);persist();paint()}}
-function pickWeapon(q){if(G.wx.includes(q))return;const r=G.cs.room[G.cs.pos[G.cs.murderer]];
-  if(q===r){solved()}else{G.wx.push(q);G.wrong++;lightning();toast('Esa arma no estaba en esa habitación.');persist();paint()}}
+
+// ---- ¡PROTESTO! ----
+function makeClaims(){const cs=G.cs,k=cs.murderer,n=cs.n,pos=cs.pos,L=[];
+  for(let q=0;q<cs.k;q++)L.push({t:'room',v:q});
+  for(const b of BT)L.push({t:'next',v:b});
+  L.push({t:'on',v:'chair'});for(const t of['top','bottom','left','right','corner'])L.push({t});
+  for(let q=0;q<n-1;q++)if(q!==k)L.push({t:'same',q},{t:'above',q},{t:'leftof',q});
+  L.forEach(c=>{c.p=k;c.truth=REL.has(c.t)?relOK(c,pos[k],pos[c.q],cs):unaryOK(c,pos[k],cs)});
+  const T=L.filter(c=>c.truth).sort(()=>Math.random()-.5),F=L.filter(c=>!c.truth).sort(()=>Math.random()-.5);
+  const nt=Math.min(T.length,1+rint(2)),pick=[...T.slice(0,nt),...F.slice(0,4-nt)].sort(()=>Math.random()-.5);
+  pick.push({t:'alone',p:k,truth:false});
+  return{claims:pick,i:-1,ok:0,combo:0,best:0,pts:0,timer:null,res:[]}}
+const CF_T=9000;
+function renderConfront(){const cs=G.cs,k=cs.murderer,cf=G.cf,P=$('#panel');
+  if(cf.i<0){P.innerHTML=`<div class="kicker" style="text-align:left">🔥 ¡Protesto!</div>
+    <div class="ph"><span class="av">${em(k)}</span><span class="nm">${nm(k)} se defiende<small>${SUSP[cs.people[k]].j}</small></span></div>
+    <p class="hint2">Va a soltar ${cf.claims.length} frases. Algunas son verdad para despistar. Mira el plano y di <b>CIERTO</b> o <b>¡MENTIRA!</b> antes de que se acabe el tiempo. Si lo clavas todo, confiesa.</p>
+    <button class="btn" data-cfgo style="font-size:18px">Empezar interrogatorio</button>`;return}
+  if(cf.i>=cf.claims.length)return;
+  const c=cf.claims[cf.i];
+  P.innerHTML=`<div class="cfh"><span>🔥 ¡PROTESTO!</span><span class="dots">${cf.claims.map((_,j)=>`<i class="${j<cf.i?(cf.res[j]?'ok':'no'):j===cf.i?'cur':''}"></i>`).join('')}</span></div>
+    <div class="bubble"><span class="av">${em(k)}</span><div class="say">«${sText(c,k)}»</div></div>
+    <div class="tbar"><i style="animation-duration:${CF_T}ms"></i></div>
+    <div class="cfb"><button class="cfy" data-cf="1">✓ CIERTO</button><button class="cfn" data-cf="0">✗ ¡MENTIRA!</button></div>
+    <div class="cfs">${cf.combo>1?`🔥 Combo x${cf.combo} · `:''}${cf.pts} pts</div>`}
+function cfStart(){const cf=G.cf;cf.i=0;sfx.stamp();renderPanel();cfArm()}
+function cfArm(){const cf=G.cf;clearTimeout(cf.timer);cf.t0=Date.now();
+  cf.timer=setTimeout(()=>cfAnswer(null),CF_T);
+  clearInterval(cf.tk);cf.tk=setInterval(()=>{if(Date.now()-cf.t0>CF_T-3200)sfx.tick()},500)}
+function cfAnswer(v){const cf=G.cf;if(!cf||cf.i<0||cf.i>=cf.claims.length||cf.lock)return;cf.lock=true;clearTimeout(cf.timer);clearInterval(cf.tk);
+  const c=cf.claims[cf.i],right=v!==null&&v===c.truth,fast=Date.now()-cf.t0<3500;
+  cf.res.push(right);
+  const P=$('#panel');
+  if(right){cf.ok++;cf.combo++;cf.best=Math.max(cf.best,cf.combo);const g=100*cf.combo+(fast?60:0);cf.pts+=g;sfx.good();
+    P.classList.add('flash-ok');floatTxt(`+${g}${fast?' ⚡':''}`,'ok')}
+  else{cf.combo=0;sfx.bad();lightning();P.classList.add('flash-no');floatTxt(v===null?'¡Tiempo!':(c.truth?'Era verdad':'Era mentira'),'no')}
+  setTimeout(()=>{P.classList.remove('flash-ok','flash-no');cf.i++;cf.lock=false;
+    if(cf.i>=cf.claims.length){const perfect=cf.ok===cf.claims.length;
+      slam(perfect?'CONFESIÓN':'LO TIENES',perfect?nm(G.cs.murderer)+' se derrumba':'Aun así, no tiene escapatoria',perfect?'':'soft');
+      setTimeout(()=>solved(cf),1300)}
+    else{renderPanel();cfArm()}},850)}
+function floatTxt(t,cls){const e=document.createElement('div');e.className='float '+cls;e.textContent=t;$('#panel').appendChild(e);setTimeout(()=>e.remove(),900)}
+
+// ---- herramientas ----
 $('#tUndo').onclick=()=>{if(!G||G.phase!=='solve'||!undo.length)return;const u=undo.pop();G.place=u.place;G.marks=new Set(u.marks);G.sel=-1;sfx.tap();paint();persist()};
 $('#tMore').onclick=()=>openModal(`<h2>Opciones</h2>
+  <button class="toggle${S.music?' on':''}" data-act="tMusic2"><span>Música<small>Piano nocturno</small></span><i></i></button>
   <button class="toggle${S.rain?' on':''}" data-act="tRain2"><span>Lluvia<small>Tormenta de fondo</small></span><i></i></button>
   <button class="toggle${S.sound?' on':''}" data-act="tSound2"><span>Sonido</span><i></i></button>
   <button class="ghost" data-act="helpG">📖 Cómo jugar</button>
   ${G&&G.phase==='solve'?'<button class="ghost danger" data-act="resetOk">⟲ Empezar el caso de cero</button>':''}
   <button class="btn" data-act="close">Seguir investigando</button>`);
-A.tRain2=()=>{setRain(!S.rain);$('#tMore').click()};A.tSound2=()=>{S.sound=!S.sound;save();$('#tMore').click()};
+A.tRain2=()=>{setRain(!S.rain);$('#tMore').click()};A.tSound2=()=>{S.sound=!S.sound;save();music();$('#tMore').click()};
+A.tMusic2=()=>{S.music=!S.music;save();music();$('#tMore').click()};
 A.helpG=()=>openModal(helpHTML(),{paper:true});
 A.resetOk=()=>{snap();G.place.fill(-1);G.marks.clear();G.stamps.fill(0);G.sel=-1;paint();persist();closeModal()};
 $('#tAsk').onclick=()=>{if(!G||G.phase!=='solve')return;
-  if(S.coffee<1){toast('Sin cafés ☕. Ganas uno por cada caso que cierras.');return}
+  if(S.coffee<1){toast('Sin cafés ☕. Ganas cafés cerrando casos y con logros.');return}
   const cs=G.cs,wrong=[];for(let p=0;p<cs.n;p++)if(G.place[p]!==cs.pos[p])wrong.push(p);if(!wrong.length)return;
-  const p=wrong.includes(G.view)?G.view:wrong[Math.floor(Math.random()*wrong.length)];
+  const p=wrong.includes(G.view)?G.view:wrong[rint(wrong.length)];
   S.coffee--;G.hints++;snap();const occ=G.place.indexOf(cs.pos[p]);if(occ>=0)G.place[occ]=-1;G.place[p]=cs.pos[p];G.marks.delete(cs.pos[p]);G.sel=-1;G.view=p;
   sfx.place();paint();const d=cellsEl()[cs.pos[p]];d.classList.add('hint');setTimeout(()=>d.classList.remove('hint'),3000);
   toast(p===V()?'El forense señala dónde cayó el cuerpo.':`${em(p)} ${nm(p)}: «Vale, vale… estaba aquí.»`);persist();check()};
-$('#gBack').onclick=()=>{persist();G=null;show('home')};
+$('#gBack').onclick=()=>{if(G&&G.cf){clearTimeout(G.cf.timer);clearInterval(G.cf.tk)}persist();G=null;show('home')};
 
-let typer;
-function solved(){
-  const cs=G.cs,k=cs.murderer,rq=cs.room[cs.pos[k]],r=RM(rq),daily=G.kind==='daily';
+// ---- final ----
+function unlock(id,list){if(S.ach[id])return;S.ach[id]=today();S.coffee++;list.push(id)}
+function solved(cf){
+  const cs=G.cs,k=cs.murderer,rq=cs.room[cs.pos[k]],r=RM(rq),daily=G.kind==='daily',par=parTime(cs.n),tt=G.solveTime??G.time;
   G.phase='done';delete S.ip[G.key];
-  const errs=G.wrong+G.hints,stars=errs===0?3:errs===1?2:1,gain=1+(stars===3?1:0)+(daily?2:0);
-  S.coffee+=gain;S.stars+=stars;S.solved++;
+  const s2=G.wrong===0&&G.hints===0,s3=cs.ch.liar?(cf&&cf.ok===cf.claims.length):tt<=par;
+  const stars=1+(s2?1:0)+(s3?1:0);
+  const candle=Math.round(Math.max(0,1-tt/par)*1000);
+  const pts=Math.max(100,1000+candle+(cf?cf.pts+(cf.ok===cf.claims.length?300:0):0)-300*G.hints-200*G.wrong);
+  const gain=1+(stars===3?1:0)+(daily?2:0);
+  S.coffee+=gain;S.stars+=stars;S.solved++;S.pts+=pts;
+  S.noCoffeeRun=G.hints?0:S.noCoffeeRun+1;
   if(daily){S.daily[today()]=true;const t=today();if(S.streak.last!==t){S.streak.count=(S.streak.last===yesterday()?S.streak.count:0)+1;S.streak.last=t}}
-  else{S.archive.unshift({no:G.lvl,t:cs.title,s:stars,tm:G.time});S.archive=S.archive.slice(0,60);S.level++}
-  save();paint();
+  else{S.archive.unshift({no:G.lvl,t:G.title,s:stars,tm:tt,p:pts});S.archive=S.archive.slice(0,60);S.level++}
+  const nu=[];unlock('primer',nu);if(stars===3)unlock('perfecto',nu);if(tt<60)unlock('rapido',nu);
+  if(cf&&cf.ok===cf.claims.length)unlock('protesto',nu);if(S.noCoffeeRun>=5)unlock('sincafe',nu);
+  const h=new Date().getHours();if(h<5)unlock('noche',nu);if(streakNow()>=3)unlock('racha3',nu);
+  if(chapterOf(S.level).id>=3)unlock('tren',nu);if(chapterOf(S.level).id>=4)unlock('hotel',nu);if(G.lk==='teatro')unlock('teatro',nu);
+  if(S.solved>=10)unlock('diez',nu);if(S.solved>=50)unlock('cincuenta',nu);
+  save();
   const b=$('#board');b.classList.add('reveal');cellsEl().forEach((c,i)=>c.classList.toggle('spot',cs.room[i]===rq));
   const t=cellsEl()[cs.pos[k]].querySelector('.who');if(t)t.classList.add('killer');
-  lightning();slam('CASO CERRADO',r.we+' '+r.w);
+  lightning();slam('CASO CERRADO',nm(k)+' · '+r.n);
+  $('#panel').innerHTML=`<div class="ph"><span class="av">${em(k)}</span><span class="nm">${nm(k)}<small>Culpable</small></span></div><p class="hint2">Caso cerrado.</p>`;
+  const motive=MOTIVES[hashStr(G.key+'m')%MOTIVES.length];
   const lie=cs.clues.find(c=>c.k==='t'&&c.p===k);
-  const story=`${nm(k)}, ${SUSP[cs.people[k]].j}, esperó a que ${cs.victim} se quedara a solas ${r.in}. Nadie más estaba allí. Usó ${r.w} ${r.we}.`+
-    (cs.ch.liar&&lie?` Luego mintió para cubrirse: «${strip(sText(lie))}»`:'');
-  const why=errs===0?'Caso perfecto: sin fallos ni cafés.':`${G.wrong?G.wrong+' acusación'+(G.wrong>1?'es':'')+' fallida'+(G.wrong>1?'s':''):''}${G.wrong&&G.hints?' y ':''}${G.hints?G.hints+' café'+(G.hints>1?'s':'')+' usado'+(G.hints>1?'s':''):''}.`;
+  const story=`${nm(k)}, ${SUSP[cs.people[k]].j}, esperó a que ${cs.victim} se quedara a solas ${r.in}. Lo hizo ${motive}.`+
+    (cs.ch.liar&&lie?` Luego mintió para cubrirse: «${strip(sText(lie))}»`:' Nadie más estaba allí para verlo.');
+  const crit=[[true,'Caso resuelto'],[s2,'Sin acusaciones fallidas ni cafés'],[s3,cs.ch.liar?'Confesión completa en ¡Protesto!':'Antes de que se apagara la vela 🕯️']];
   setTimeout(()=>{sfx.win();
-    openModal(`<div class="kicker">Caso cerrado</div><h2>${cs.title}</h2>${starsHTML(stars)}
-    <p style="text-align:center;font-size:13px;opacity:.75">${why}</p>
+    openModal(`<div class="kicker">Caso cerrado · ${LOC().ico} ${LOC().n}</div><h2>${G.title}</h2>${starsHTML(stars)}
+    <ul class="crit">${crit.map(([ok,t])=>`<li class="${ok?'ok':''}">${ok?'★':'☆'} ${t}</li>`).join('')}</ul>
+    <div class="score"><span id="ptsN">0</span> pts</div>
     <div class="typed" id="typed"></div>
-    <div class="res"><span class="pill">⏱ ${fmt(G.time)}</span><span class="pill">+${gain} ☕</span></div>
-    ${daily?`<p style="text-align:center">Racha: 🔥 ${streakNow()} días</p><button class="btn" data-act="home">Volver a la mansión</button>`:`<button class="btn" data-act="next">Siguiente expediente →</button><button class="ghost" data-act="home">Volver al inicio</button>`}`,{paper:true,locked:true});
+    ${nu.length?`<div class="achs">${nu.map(id=>{const a=ACH.find(x=>x[0]===id);return`<span>🏆 ${a[1]} ${a[2]} <b>+1 ☕</b></span>`}).join('')}</div>`:''}
+    <div class="res"><span class="pill">⏱ ${fmt(tt)}</span><span class="pill">+${gain} ☕</span>${cf?`<span class="pill">🔥 ${cf.ok}/${cf.claims.length}</span>`:''}</div>
+    ${daily?`<p style="text-align:center">Racha: 🔥 ${streakNow()} días</p><button class="btn" data-act="home">Volver al inicio</button>`:`<button class="btn" data-act="next">Siguiente expediente →</button><button class="ghost" data-act="home">Volver al inicio</button>`}`,{paper:true,locked:true});
+    let c0=0;const pe=$('#ptsN'),st=Date.now();const cu=setInterval(()=>{const f=Math.min(1,(Date.now()-st)/1100);pe.textContent=Math.round(pts*f).toLocaleString('es-ES');if(f>=1)clearInterval(cu);else if(++c0%2)sfx.tick()},40);
     let i=0;const el=$('#typed');clearInterval(typer);
-    typer=setInterval(()=>{i++;el.innerHTML=story.slice(0,i)+'<span class="cur"></span>';if(i%3===0)sfx.type();if(i>=story.length)clearInterval(typer)},26);
-  },3000);
+    typer=setInterval(()=>{i++;el.innerHTML=story.slice(0,i)+'<span class="cur"></span>';if(i%3===0)sfx.type();if(i>=story.length)clearInterval(typer)},24);
+    if(nu.length)setTimeout(sfx.coin,1200);
+  },2600);
 }
 function starsHTML(n){return'<div class="stars">'+[1,2,3].map(i=>`<span class="${i<=n?'':'off'}">⭐</span>`).join('')+'</div>'}
 A.next=()=>{closeModal();startCase('level')};
 A.home=()=>{closeModal();G=null;show('home')};
 
 // ===================== TIMER / AMBIENTE =====================
-setInterval(()=>{if(document.hidden||!$('#modal').hidden||!G||G.phase!=='solve'||$('#game').hidden)return;
-  G.time++;$('#gTime').textContent=fmt(G.time);if(G.time%5===0)persist()},1000);
+setInterval(()=>{if(document.hidden||!$('#modal').hidden||!G||G.phase!=='solve'||$('#game').hidden||!$('#banner').hidden&&$('#banner').classList.contains('intro'))return;
+  G.time++;paintCandle();
+  if(!G.candleOut&&G.time>parTime(G.cs.n)){G.candleOut=true;toast('🕯️ La vela se ha apagado. Sigue: aún puedes resolverlo.')}
+  if(G.time%5===0)persist()},1000);
 setInterval(()=>{if(S.rain&&!document.hidden&&Math.random()<.35)lightning()},22000);
 
 // ===================== MENÚ =====================
-$('#hOpen').onclick=()=>{ac();if(S.rain)setRain(true);startCase('level')};
-$('#hDaily').onclick=()=>{if(S.daily[today()]){toast('El caso de hoy ya está cerrado. Mañana habrá otro.');return}ac();if(S.rain)setRain(true);startCase('daily')};
+$('#hOpen').onclick=()=>startCase('level');
+$('#hDaily').onclick=()=>{if(S.daily[today()]){toast('El caso de hoy ya está cerrado. Mañana habrá otro.');return}startCase('daily')};
 function helpHTML(){const c=chapterOf(S.level).id;
   return`<div class="kicker">Manual del detective</div><h2>Cómo jugar</h2>${CH[1].intro}
-  ${[2,3,4].filter(i=>i<=c||i===2).map(i=>`<h3 style="font-size:20px;margin-top:4px">${i<=c?'':'🔒 '}${CH[i].n}</h3>${i<=c?CH[i].intro:'<p style="opacity:.6">Se desbloquea más adelante.</p>'}`).join('')}
-  <ul class="rules"><li>☕ <b>Interrogar</b> coloca a alguien en su sitio real. Ganas cafés cerrando casos.</li>
-  <li>Toca a alguien abajo para ver lo que declara y colocarlo. El punto 🔴/🟢 de cada ficha te dice si lo que dice cuadra donde lo has puesto.</li><li>Cuando todo encaje, <b>toca al culpable en el plano</b> y elige el arma.</li><li>⭐⭐⭐ si no fallas ninguna acusación ni usas cafés.</li>
-  <li>Cada caso tiene una única solución y se resuelve solo con lógica.</li></ul>
+  ${[2,3,4,5].map(i=>`<h3 style="font-size:20px;margin-top:4px">${i<=c?'':'🔒 '}${CH[i].n}</h3>${i<=c?CH[i].intro:'<p style="opacity:.6">Se desbloquea más adelante.</p>'}`).join('')}
+  <h3 style="font-size:20px;margin-top:4px">Estrellas</h3>
+  <ul class="rules"><li>★ Resolver el caso.</li><li>★ Sin acusaciones fallidas ni cafés.</li><li>★ Capítulo 1: antes de que se apague la vela. Desde el 2: confesión completa en ¡Protesto!</li>
+  <li>☕ <b>Interrogar</b> coloca a alguien en su sitio real. Ganas cafés cerrando casos y con logros.</li></ul>
   <button class="btn" data-act="close">Entendido</button>`}
 $('#mHelp').onclick=()=>openModal(helpHTML(),{paper:true});
-$('#mArch').onclick=()=>openModal(`<h2>Archivo</h2>${S.archive.length?`<div class="arch">${S.archive.map(a=>`<div><b>Nº ${a.no} · ${a.t}</b><span>${'⭐'.repeat(a.s)} ${fmt(a.tm)}</span></div>`).join('')}</div>`:'<p style="text-align:center;color:var(--mute)">Aún no has cerrado ningún caso.</p>'}<button class="ghost" data-act="close">Cerrar</button>`);
+$('#mAch').onclick=()=>openModal(`<h2>Logros</h2><div class="achl">${ACH.map(a=>`<div class="${S.ach[a[0]]?'got':''}"><span>${S.ach[a[0]]?a[1]:'🔒'}</span><b>${a[2]}</b><small>${a[3]}</small></div>`).join('')}</div><p style="text-align:center;font-size:13px;color:var(--mute)">Cada logro da +1 ☕</p><button class="ghost" data-act="close">Cerrar</button>`);
+$('#mArch').onclick=()=>openModal(`<h2>Archivo</h2>${S.archive.length?`<div class="arch">${S.archive.map(a=>`<div><b>Nº ${a.no} · ${a.t}</b><span>${'⭐'.repeat(a.s)} ${a.p?a.p+' pts':fmt(a.tm)}</span></div>`).join('')}</div>`:'<p style="text-align:center;color:var(--mute)">Aún no has cerrado ningún caso.</p>'}<button class="ghost" data-act="close">Cerrar</button>`);
 function setHTML(){return`<h2>Ajustes</h2>
+  <button class="toggle${S.music?' on':''}" data-act="tMusic"><span>Música<small>Piano nocturno de fondo</small></span><i></i></button>
   <button class="toggle${S.sound?' on':''}" data-act="tSound"><span>Sonido<small>Pasos, sellos y truenos</small></span><i></i></button>
-  <button class="toggle${S.rain?' on':''}" data-act="tRain"><span>Lluvia<small>Ambiente de tormenta mientras investigas</small></span><i></i></button>
+  <button class="toggle${S.rain?' on':''}" data-act="tRain"><span>Lluvia<small>Tormenta mientras investigas</small></span><i></i></button>
   <button class="ghost danger" data-act="wipe">Borrar todo el progreso</button>
-  <p style="font-size:12px;color:var(--mute);text-align:center">Versión 4 · El progreso se guarda solo en este navegador. En Safari: Compartir → Añadir a pantalla de inicio, y lo tienes como app.</p>
+  <p style="font-size:12px;color:var(--mute);text-align:center">Versión 5 · El progreso se guarda en este dispositivo.</p>
   <button class="btn" data-act="close">Listo</button>`}
 $('#mSet').onclick=()=>openModal(setHTML());
-A.tSound=()=>{S.sound=!S.sound;save();$('#sheet').innerHTML=setHTML();sfx.tap()};
+A.tSound=()=>{S.sound=!S.sound;save();music();$('#sheet').innerHTML=setHTML();sfx.tap()};
+A.tMusic=()=>{S.music=!S.music;save();music();$('#sheet').innerHTML=setHTML()};
 A.tRain=()=>{setRain(!S.rain);$('#sheet').innerHTML=setHTML()};
 A.wipe=b=>{if(b.dataset.sure){S=structuredClone(DEF);save();setRain(false);closeModal();renderHome();toast('Progreso borrado')}else{b.dataset.sure='1';b.textContent='Toca otra vez para confirmar'}};
 
 renderHome();
 if(S.rain)$('#rain').classList.add('on');
 if(!S.seenHelp){S.seenHelp=true;S.seenCh[1]=true;save();setTimeout(()=>openModal(`<div class="kicker">Medianoche. Llueve.</div><h2>Bienvenid@, detective</h2>
-  <p style="text-align:center">En esta mansión cada noche aparece un cadáver. Tú colocas a cada sospechoso en el plano con lo que declaran, y descubres quién fue.</p>${CH[1].intro}
+  <p style="text-align:center">Cada noche aparece un cadáver. Colocas a los sospechosos en el plano con lo que declaran, señalas al culpable y le haces confesar.</p>${CH[1].intro}
   <button class="btn" data-act="close">Abrir el primer caso</button>`,{paper:true}),350)}
 
 </script>
