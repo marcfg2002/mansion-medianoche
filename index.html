@@ -866,7 +866,7 @@ function setHTML(){return`<h2>Ajustes</h2>
   <button class="toggle${S.sound?' on':''}" data-act="tSound"><span>Sonido<small>Pasos, sellos y truenos</small></span><i></i></button>
   <button class="toggle${S.rain?' on':''}" data-act="tRain"><span>Lluvia<small>Ambiente de tormenta mientras investigas</small></span><i></i></button>
   <button class="ghost danger" data-act="wipe">Borrar todo el progreso</button>
-  <p style="font-size:12px;color:var(--mute);text-align:center">El progreso se guarda solo en este navegador. En Safari: Compartir → Añadir a pantalla de inicio, y lo tienes como app.</p>
+  <p style="font-size:12px;color:var(--mute);text-align:center">Versión 4 · El progreso se guarda solo en este navegador. En Safari: Compartir → Añadir a pantalla de inicio, y lo tienes como app.</p>
   <button class="btn" data-act="close">Listo</button>`}
 $('#mSet').onclick=()=>openModal(setHTML());
 A.tSound=()=>{S.sound=!S.sound;save();$('#sheet').innerHTML=setHTML();sfx.tap()};
@@ -881,6 +881,15 @@ if(!S.seenHelp){S.seenHelp=true;S.seenCh[1]=true;save();setTimeout(()=>openModal
 
 </script>
 
-<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+<script>
+if('serviceWorker' in navigator){
+  let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded)return;reloaded=true;location.reload()});
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    const up=()=>reg.update().catch(()=>{});up();
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden)up()});
+  }).catch(()=>{});
+}
+</script>
 </body>
 </html>
