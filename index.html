@@ -1,0 +1,798 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mansión">
+<meta name="theme-color" content="#100d12">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}body{margin:0}img{max-width:100%}</style>
+<title>Mansión Medianoche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Karla:wght@500;700;800&family=Special+Elite&display=swap">
+<style>
+/* Layout: app de una columna; plano de la mansión arriba, expediente de papel debajo; todo en tonos de noche y lámpara */
+:root{
+  --bg:#100d12; --bg2:#19141a; --card:#221b22; --line:#3b2f37;
+  --ink:#efe6d6; --mute:#a3968e; --brass:#d9a648; --red:#c7372f; --green:#3f8f58;
+  --paper:#ece2cc; --paper2:#d8c9a6; --pink-ink:#2a2018; --wall:#171216;
+  --f-display:'DM Serif Display',Georgia,'Times New Roman',serif;
+  --f-type:'Special Elite','Courier New',monospace;
+  --f-body:'Karla',-apple-system,system-ui,sans-serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overscroll-behavior:none;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background-image:radial-gradient(ellipse 80% 45% at 50% -5%,rgba(217,166,72,.16),transparent 70%),radial-gradient(ellipse at 50% 120%,#1d1420,transparent 60%);background-attachment:fixed}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;-webkit-appearance:none}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+button:active{transform:scale(.97)}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance}
+.screen{max-width:520px;margin:0 auto;padding-block:10px 36px;display:flex;flex-direction:column;gap:14px}
+
+/* lluvia */
+#rain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0;transition:opacity 1s;
+  background-image:repeating-linear-gradient(102deg,transparent 0 22px,rgba(180,190,220,.07) 22px 23px,transparent 23px 47px),repeating-linear-gradient(98deg,transparent 0 31px,rgba(180,190,220,.05) 31px 32px,transparent 32px 61px);
+  background-size:200px 200px,260px 260px;animation:rain .45s linear infinite}
+#rain.on{opacity:1}
+@keyframes rain{to{background-position:-40px 200px,-50px 260px}}
+#flash{position:fixed;inset:0;background:#dfe6ff;opacity:0;pointer-events:none;z-index:80}
+#flash.go{animation:flash .7s}
+@keyframes flash{0%,100%{opacity:0}10%{opacity:.55}20%{opacity:.05}30%{opacity:.35}}
+.screen{position:relative;z-index:2}
+
+/* ---------- HOME ---------- */
+.brand{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding-top:8px}
+.brand h1{font-size:42px;line-height:.92;letter-spacing:-.01em}
+.brand h1 i{color:var(--brass);font-style:italic}
+.pills{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-weight:800;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rank{display:flex;align-items:center;gap:12px;background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:10px 14px}
+.badge{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f3cf7d,#a8741f);display:grid;place-items:center;font-size:22px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25),0 0 0 3px #3b2a10;flex-shrink:0}
+.rank b{font-family:var(--f-display);font-weight:400;font-size:19px;display:block}
+.rank small{color:var(--mute);font-weight:700}
+.rank .bar{flex:1;min-width:0}
+.meter{height:6px;border-radius:99px;background:var(--line);margin-top:6px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--brass);border-radius:99px}
+.folder{position:relative;background:var(--paper);color:var(--pink-ink);border-radius:4px 18px 18px 18px;padding:20px 18px 18px;text-align:left;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 0 var(--paper2),0 18px 40px rgba(0,0,0,.5);margin-top:14px}
+.folder::before{content:"";position:absolute;left:0;top:-14px;width:44%;height:16px;background:var(--paper);border-radius:10px 10px 0 0}
+.folder .no{font-family:var(--f-type);font-size:13px;letter-spacing:.14em;color:var(--red)}
+.folder h2{font-size:30px;line-height:1.05}
+.folder p{margin:0;font-family:var(--f-type);font-size:13.5px;line-height:1.45;opacity:.8}
+.folder .open{margin-top:6px;background:var(--pink-ink);color:var(--paper);font-family:var(--f-type);letter-spacing:.08em;padding:13px;border-radius:10px;text-align:center;font-size:15px}
+.stamp{position:absolute;right:14px;top:16px;transform:rotate(9deg);border:2.5px solid var(--red);color:var(--red);font-family:var(--f-type);font-size:12px;padding:3px 8px;letter-spacing:.1em;opacity:.8}
+.chapters{display:flex;gap:6px}
+.chapters div{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;font-weight:800;color:var(--mute);line-height:1.2}
+.chapters div b{display:block;font-family:var(--f-display);font-weight:400;font-size:18px;color:var(--ink)}
+.chapters div.cur{border-color:var(--brass);color:var(--brass)}
+.chapters div.lock{opacity:.4}
+.daily{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;text-align:left}
+.daily span:first-child{font-size:28px}
+.daily b{font-family:var(--f-display);font-weight:400;font-size:19px;display:block}
+.daily small{color:var(--mute);font-weight:700}
+.daily.done{border-color:var(--green)}
+.daily.done small{color:#79c48f}
+.menu{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.menu button{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:11px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;font-weight:800;font-size:13px}
+.menu button span{font-size:22px}
+
+/* ---------- GAME ---------- */
+.gbar{display:flex;align-items:center;gap:10px;min-height:44px}
+.back,.ibtn{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:20px;display:grid;place-items:center;flex-shrink:0}
+.ibtn.on{border-color:var(--brass);background:#2e2414}
+.gbar h2{flex:1;min-width:0;font-size:19px;line-height:1.1;overflow:hidden}
+.gbar h2 small{display:block;font-family:var(--f-type);font-size:11px;color:var(--brass);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gbar h2 span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;color:var(--mute);font-size:14px}
+.tray{display:flex;gap:8px;overflow-x:auto;padding:6px 2px 8px;scrollbar-width:none;margin:0 -2px}
+.tray::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;width:66px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 6px;border-radius:14px;background:var(--paper);color:var(--pink-ink);border:2px solid transparent;font-weight:800;font-size:12px;position:relative;transition:transform .15s,opacity .2s}
+.chip span{font-size:28px;line-height:1}
+.chip.placed{opacity:.38}
+.chip.sel{border-color:var(--red);transform:translateY(-4px);box-shadow:0 6px 0 rgba(199,55,47,.45)}
+.chip.vict{background:#2b2327;color:#e8dcdc;border-style:dashed;border-color:#8b7d7d}
+.chip.vict.sel{border-color:var(--red);border-style:solid}
+.chip .mk{position:absolute;top:-6px;right:-4px;font-family:var(--f-type);font-size:9px;padding:1px 4px;border-radius:4px;color:#fff;transform:rotate(8deg)}
+.chip .mk.l{background:var(--red)}.chip .mk.t{background:var(--green)}
+
+.boardwrap{display:flex;justify-content:center}
+.board{--n:5;position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));grid-template-rows:repeat(var(--n),minmax(0,1fr));
+  width:min(100%,460px);aspect-ratio:1;max-width:100%;container-type:inline-size;border:4px solid var(--wall);border-radius:10px;overflow:hidden;background:var(--wall);
+  box-shadow:0 0 0 1px #3a2c2f,0 20px 50px rgba(0,0,0,.6)}
+.cell{position:relative;min-width:0;min-height:0;overflow:hidden;display:grid;place-items:center}
+.cell::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.035) 0 2px,transparent 2px 9px);pointer-events:none}
+.cell .obj{font-size:calc(100cqw/var(--n)*.5);line-height:1;position:relative;z-index:1}
+.cell.rug .rugbg{position:absolute;inset:13%;border-radius:4px;background:repeating-linear-gradient(45deg,rgba(140,30,40,.6) 0 4px,rgba(200,120,60,.5) 4px 8px);border:2px solid rgba(110,25,35,.6)}
+.cell .slot{position:absolute;inset:0;display:grid;place-items:center;z-index:2}
+.cell .who{width:84%;height:84%;border-radius:50%;background:#fbf6ea;display:grid;place-items:center;font-size:calc(100cqw/var(--n)*.5);box-shadow:0 3px 0 rgba(0,0,0,.4);animation:drop .3s cubic-bezier(.3,1.6,.5,1)}
+.cell .who.v{background:transparent;border:2px dashed #fff;box-shadow:none;filter:drop-shadow(0 1px 2px #000)}
+.cell.has .obj{position:absolute;right:3%;bottom:2%;font-size:calc(100cqw/var(--n)*.24);z-index:3}
+.cell .x{font-weight:800;font-size:calc(100cqw/var(--n)*.3);color:rgba(30,20,20,.42)}
+.cell .ft{position:absolute;left:4%;top:3%;font-size:calc(100cqw/var(--n)*.22);z-index:3;filter:drop-shadow(0 0 2px rgba(255,255,255,.7))}
+.cell.conf .who{box-shadow:0 0 0 3px var(--red),0 3px 0 rgba(0,0,0,.4)}
+.cell.sel .who{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--red)}
+.cell.taken{filter:brightness(.62) saturate(.6)}
+.cell.target::after{content:"";position:absolute;inset:3px;border:2px dashed rgba(255,255,255,.55);border-radius:6px;pointer-events:none}
+.cell.hint{animation:hintg 1s 3}
+@keyframes hintg{50%{filter:brightness(1.5)}}
+@keyframes drop{from{transform:translateY(-30%) scale(.5);opacity:0}}
+.doors{position:absolute;inset:0;pointer-events:none;z-index:4}
+.door{position:absolute;background:var(--brass);border-radius:2px;box-shadow:0 0 0 1px #3b2a10}
+.board.reveal .cell{filter:brightness(.35) saturate(.3);transition:filter .8s}
+.board.reveal .cell.spot{filter:none}
+
+.legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;background:var(--bg2);border:1px solid var(--line);padding:4px 10px 4px 5px;border-radius:999px}
+.legend i{width:16px;height:16px;border-radius:5px;display:block}
+.tools{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tbtn{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 14px;min-height:44px;font-weight:800;display:flex;align-items:center;gap:6px}
+.tbtn small{color:var(--brass);font-size:12px}
+.tbtn.big{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--f-type);letter-spacing:.05em;width:100%;justify-content:center;font-size:16px;padding:14px;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(199,55,47,.25)}}
+.help{color:var(--mute);font-size:13px;text-align:center;margin:0;line-height:1.45}
+.help b{color:var(--ink)}
+
+/* expediente */
+.file{background:var(--paper);color:var(--pink-ink);border-radius:4px 16px 16px 16px;padding:14px 14px 10px;font-family:var(--f-type);box-shadow:0 6px 0 var(--paper2)}
+.file h3{font-family:var(--f-type);font-size:13px;letter-spacing:.14em;text-transform:uppercase;display:flex;justify-content:space-between;gap:8px;border-bottom:1.5px dashed rgba(42,32,24,.35);padding-bottom:8px;margin-bottom:6px}
+.file h3 small{color:var(--red);font-size:11px;text-align:right}
+.rule{font-family:var(--f-body);font-size:13px;line-height:1.45;background:rgba(199,55,47,.08);border-left:3px solid var(--red);padding:7px 10px;border-radius:0 8px 8px 0;margin:6px 0}
+.st{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(42,32,24,.3);display:grid;place-items:center;font-family:var(--f-body);font-weight:800;font-size:12px}
+.line{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dotted rgba(42,32,24,.25);font-size:14px;line-height:1.38}
+.line:last-child{border-bottom:0}
+.line .tx{flex:1;min-width:0}
+.line.ok .st{background:var(--green);border-color:var(--green);color:#fff}
+.line.no{background:rgba(199,55,47,.07)}
+.line.no .st{background:var(--red);border-color:var(--red);color:#fff}
+.line b{font-weight:400;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:2px}
+.susp{border-radius:12px;padding:8px 8px 2px;margin:0 -6px 4px;position:relative}
+.susp.sel{background:rgba(199,55,47,.09);box-shadow:inset 0 0 0 1.5px rgba(199,55,47,.45)}
+.sh{display:flex;align-items:center;gap:9px}
+.sh .av{font-size:26px;line-height:1}
+.sh .nm{flex:1;min-width:0;font-family:var(--f-body);font-weight:800;font-size:15px;line-height:1.15}
+.sh .nm small{display:block;font-weight:700;font-size:12px;opacity:.6}
+.seal{font-family:var(--f-type);font-size:11px;letter-spacing:.08em;border:2px dashed rgba(42,32,24,.35);border-radius:6px;padding:5px 7px;color:rgba(42,32,24,.6);flex-shrink:0;min-width:74px;text-align:center}
+.seal.l{border:2.5px solid var(--red);color:var(--red);transform:rotate(-6deg);background:rgba(199,55,47,.06)}
+.seal.t{border:2.5px solid var(--green);color:var(--green);transform:rotate(4deg)}
+.quote{font-style:normal}
+.quote::before{content:"«"}.quote::after{content:"»"}
+.verdict{font-family:var(--f-body);font-size:11.5px;font-weight:800;margin:2px 0 4px 35px}
+.verdict.bad{color:var(--red)}.verdict.good{color:var(--green)}
+
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,40px);opacity:0;background:var(--paper);color:var(--pink-ink);font-family:var(--f-type);padding:11px 16px;border-radius:10px;max-width:min(90vw,420px);text-align:center;transition:.25s;z-index:60;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:14px;line-height:1.4}
+.toast.on{transform:translate(-50%,0);opacity:1}
+
+/* ---------- MODALES ---------- */
+.modal{position:fixed;inset:0;background:rgba(8,5,9,.78);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:grid;place-items:center;z-index:50;
+  padding:calc(14px + env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--bg2);border:1px solid var(--line);border-radius:22px;padding:22px 18px 18px;width:min(100%,430px);max-height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:13px;animation:rise .3s cubic-bezier(.3,1.4,.5,1)}
+.sheet.paper{background:var(--paper);color:var(--pink-ink);border:0}
+@keyframes rise{from{transform:translateY(24px) scale(.96);opacity:0}}
+.sheet h2{font-size:28px;text-align:center;line-height:1.1}
+.sheet p{margin:0;line-height:1.5}
+.kicker{font-family:var(--f-type);font-size:12px;letter-spacing:.16em;text-align:center;color:var(--red);text-transform:uppercase}
+.btn{background:var(--brass);color:#21170a;font-family:var(--f-display);font-size:20px;padding:13px;border-radius:14px;width:100%}
+.btn:disabled{opacity:.35}
+.ghost{border:1.5px solid var(--line);font-weight:800;padding:12px;border-radius:14px;width:100%}
+.paper .ghost{border-color:rgba(42,32,24,.3)}
+.stars{font-size:42px;text-align:center;letter-spacing:4px}
+.stars .off{filter:grayscale(1) brightness(.45)}
+.stars span{display:inline-block;animation:drop .45s cubic-bezier(.3,1.6,.5,1) both}
+.stars span:nth-child(2){animation-delay:.15s}.stars span:nth-child(3){animation-delay:.3s}
+.res{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.paper .pill{background:rgba(42,32,24,.08);border-color:rgba(42,32,24,.2)}
+.acc h4{margin:4px 0 0;font-family:var(--f-type);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:400}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{background:#fff8ea;border:2px solid rgba(42,32,24,.2);border-radius:12px;padding:7px 10px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:6px}
+.opt span{font-size:20px}
+.opt.on{border-color:var(--red);background:#ffe9e0}
+.opt.wrong{opacity:.35;text-decoration:line-through}
+.typed{font-family:var(--f-type);font-size:15px;line-height:1.6;min-height:5.5em}
+.typed .cur{display:inline-block;width:8px;height:1em;background:currentColor;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.rules{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.rules li{background:var(--card);border-radius:12px;padding:9px 12px;line-height:1.42;font-size:14px}
+.paper .rules li{background:rgba(42,32,24,.07)}
+.demo{display:flex;gap:10px;align-items:center;justify-content:center;font-size:30px;padding:6px}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card);border-radius:14px;padding:12px 14px;font-weight:800;text-align:left;width:100%}
+.toggle i{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;flex-shrink:0;transition:.2s}
+.toggle i::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.toggle.on i{background:var(--green)}.toggle.on i::after{left:21px}
+.toggle small{display:block;color:var(--mute);font-size:12px;font-weight:700}
+.danger{color:#ff8c84;border-color:rgba(199,55,47,.5)}
+.arch{display:flex;flex-direction:column;gap:6px}
+.arch div{display:flex;justify-content:space-between;gap:10px;background:var(--card);border-radius:10px;padding:8px 12px;font-size:13px}
+.arch div b{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.arch div span{flex-shrink:0;color:var(--brass)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div id="rain"></div><div id="flash"></div>
+<section class="screen" id="home">
+  <div class="brand">
+    <h1>Mansión<br><i>Medianoche</i></h1>
+    <div class="pills"><span class="pill" id="hCoffee">☕ 3</span><span class="pill" id="hStreak">🔥 0 días</span></div>
+  </div>
+  <div class="rank" id="hRank"></div>
+  <button class="folder" id="hOpen">
+    <span class="stamp">CONFIDENCIAL</span>
+    <span class="no" id="hNo">EXPEDIENTE Nº 1</span>
+    <h2 id="hTitle">…</h2>
+    <p id="hDesc"></p>
+    <span class="open" id="hBtn">ABRIR EXPEDIENTE</span>
+  </button>
+  <div class="chapters" id="hCh"></div>
+  <button class="daily" id="hDaily"><span>🗝️</span><span><b>Caso del día</b><small id="hDailyS">Un misterio nuevo cada día · +2 ☕</small></span></button>
+  <div class="menu">
+    <button id="mHelp"><span>📖</span>Cómo jugar</button>
+    <button id="mArch"><span>🗄️</span>Archivo</button>
+    <button id="mSet"><span>⚙️</span>Ajustes</button>
+  </div>
+</section>
+
+<section class="screen" id="game" hidden>
+  <div class="gbar">
+    <button class="back" id="gBack" aria-label="Volver">‹</button>
+    <h2><small id="gCh">CAP. 1</small><span id="gTitle">Caso</span></h2>
+    <span class="timer" id="gTime">0:00</span>
+    <button class="ibtn" id="gRain" aria-label="Lluvia">🌧️</button>
+  </div>
+  <div class="tray" id="tray"></div>
+  <div class="boardwrap"><div class="board" id="board"></div></div>
+  <div class="legend" id="legend"></div>
+  <div class="tools">
+    <button class="tbtn" id="tUndo">↶ Deshacer</button>
+    <button class="tbtn" id="tAsk">☕ Interrogar</button>
+    <button class="tbtn" id="tReset">⟲</button>
+  </div>
+  <div id="accWrap"></div>
+  <p class="help" id="gHelp">Elige a alguien arriba y toca dónde estaba. Toca una casilla vacía para tacharla.</p>
+  <div class="file" id="forensic"></div>
+  <div class="file" id="file"></div>
+</section>
+
+<div class="modal" id="modal" hidden><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+// ===== RNG / utilidades =====
+function hashStr(s){let h=1779033703^s.length;for(let i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19}return h>>>0}
+function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=(rng,n)=>Math.floor(rng()*n);
+const pick=(rng,a)=>a[rnd(rng,a.length)];
+function shuffle(a,rng){for(let i=a.length-1;i>0;i--){const j=rnd(rng,i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const range=n=>[...Array(n).keys()];
+function adj4(i,n){const r=i/n|0,c=i%n,o=[];if(r>0)o.push(i-n);if(r<n-1)o.push(i+n);if(c>0)o.push(i-1);if(c<n-1)o.push(i+1);return o}
+function growFrom(n,reg,k,w,rng){
+  let left=reg.filter(x=>x===-1).length;
+  while(left>0){let tot=0;for(const x of w)tot+=x;let t=rng()*tot,q=0;for(;q<k-1;q++){t-=w[q];if(t<0)break}
+    const fr=[];for(let i=0;i<n*n;i++)if(reg[i]===-1&&adj4(i,n).some(j=>reg[j]===q))fr.push(i);
+    if(!fr.length){w[q]=0;continue}reg[fr[rnd(rng,fr.length)]]=q;left--}
+  return reg}
+
+// ===== Datos =====
+const ROOMS=[
+ {n:'Cocina',in:'en la cocina',a:'la cocina',w:'la sartén',we:'🍳'},
+ {n:'Salón',in:'en el salón',a:'el salón',w:'el candelabro',we:'🕯️'},
+ {n:'Biblioteca',in:'en la biblioteca',a:'la biblioteca',w:'un tomo gordísimo',we:'📕'},
+ {n:'Baño',in:'en el baño',a:'el baño',w:'la navaja de afeitar',we:'🪒'},
+ {n:'Dormitorio',in:'en el dormitorio',a:'el dormitorio',w:'el ovillo de lana',we:'🧶'},
+ {n:'Jardín',in:'en el jardín',a:'el jardín',w:'las tijeras de podar',we:'✂️'},
+ {n:'Estudio',in:'en el estudio',a:'el estudio',w:'el abrecartas',we:'✉️'},
+ {n:'Bodega',in:'en la bodega',a:'la bodega',w:'una botella de reserva',we:'🍷'},
+ {n:'Invernadero',in:'en el invernadero',a:'el invernadero',w:'un cactus enorme',we:'🌵'},
+ {n:'Desván',in:'en el desván',a:'el desván',w:'el violín del abuelo',we:'🎻'}];
+const SUSP=[
+ {n:'Bruno',e:'🧔',g:'o',j:'el jardinero'},{n:'Carla',e:'👩‍🦰',g:'a',j:'la sobrina'},{n:'Dani',e:'👨‍🍳',g:'o',j:'el cocinero'},
+ {n:'Elena',e:'👵',g:'a',j:'la ama de llaves'},{n:'Fermín',e:'👴',g:'o',j:'el notario'},{n:'Gala',e:'💃',g:'a',j:'la cantante'},
+ {n:'Irene',e:'👩‍🔬',g:'a',j:'la química'},{n:'Julio',e:'🤵',g:'o',j:'el mayordomo'},{n:'Lola',e:'👩‍🎤',g:'a',j:'la nieta rebelde'},
+ {n:'Marcos',e:'🧑‍🎨',g:'o',j:'el pintor'},{n:'Nuria',e:'👩‍💼',g:'a',j:'la abogada'},{n:'Óscar',e:'👨‍🚀',g:'o',j:'el primo astronauta'},
+ {n:'Paca',e:'👩‍🌾',g:'a',j:'la vecina'},{n:'Rubén',e:'🧑‍🎤',g:'o',j:'el músico'}];
+const VICT=['Don Anselmo','Doña Remedios','Conde Ramiro','Marquesa Pili','Tío Eusebio','Sir Bigotes','Doña Puri','Barón Tadeo','Madame Coco','Don Fulgencio'];
+const TITLES=['El último brindis de {V}','Silencio en casa de {V}','Una cena mortal para {V}','{V} no llegó al postre','La noche en que cayó {V}','El testamento de {V}','Tormenta sobre la mansión de {V}','Nadie oyó gritar a {V}'];
+const OBJ={
+ plant:{e:'🪴',block:1,a:'una planta',no:'ninguna planta'},
+ shelf:{e:'📚',block:1,a:'una estantería',no:'ninguna estantería'},
+ table:{e:'🍽️',block:1,a:'una mesa',no:'ninguna mesa'},
+ chair:{e:'🪑',block:0},rug:{e:'',block:0}};
+const BT=['plant','shelf','table'];
+const isBlock=o=>!!(o&&OBJ[o].block);
+
+function chapterOf(l){
+  if(l<=4)return{id:1,n:4,liar:false,doors:false,feet:false};
+  if(l<=12)return{id:2,n:5,liar:true,doors:false,feet:false};
+  if(l<=24)return{id:3,n:l<=18?5:6,liar:true,doors:true,feet:false};
+  if(l<=40)return{id:4,n:6,liar:true,doors:true,feet:true};
+  return{id:5,n:l%10===0?7:6,liar:true,doors:true,feet:true};
+}
+
+// ===== Evaluación =====
+function unaryOK(cl,i,cs){const n=cs.n,r=i/n|0,c=i%n;
+  switch(cl.t){
+    case 'room':return cs.room[i]===cl.v;case 'nroom':return cs.room[i]!==cl.v;
+    case 'on':return cs.obj[i]===cl.v;
+    case 'next':return adj4(i,n).some(j=>cs.obj[j]===cl.v);
+    case 'nnext':return !adj4(i,n).some(j=>cs.obj[j]===cl.v);
+    case 'top':return r===0;case 'bottom':return r===n-1;case 'left':return c===0;case 'right':return c===n-1;
+    case 'corner':return(r===0||r===n-1)&&(c===0||c===n-1);
+    case 'row':return r===cl.v;case 'col':return c===cl.v;
+    case 'door':return cs.room[i]!==cl.v&&cs.dp.has(Math.min(cs.room[i],cl.v)+'-'+Math.max(cs.room[i],cl.v));
+  }return true}
+function relOK(cl,i,j,cs){const n=cs.n;
+  switch(cl.t){case 'same':return cs.room[i]===cs.room[j];case 'diff':return cs.room[i]!==cs.room[j];
+    case 'above':return(i/n|0)<(j/n|0);case 'leftof':return i%n<j%n}return true}
+const REL=new Set(['same','diff','above','leftof']);
+// valor de verdad de una pista con posiciones (null si no se sabe aún)
+function truthOf(cl,pos,cs){
+  if(cl.t==='empty'){if(pos.some(i=>i>=0&&cs.room[i]===cl.v))return false;return pos.every(i=>i>=0)?true:null}
+  if(cl.t==='foot'){if(pos.includes(cl.v))return true;return pos.every(i=>i>=0)?false:null}
+  if(REL.has(cl.t)){const a=pos[cl.p],b=pos[cl.q];if(a<0||b<0)return null;return relOK(cl,a,b,cs)}
+  const a=pos[cl.p];if(a<0)return null;return unaryOK(cl,a,cs)}
+
+// ===== Solver =====
+// Cuenta soluciones. Si liar: el culpable (único sospechoso a solas con la víctima) tiene todas sus declaraciones falsas.
+function solveCase(cs,clues,limit,liar){
+  const n=cs.n,N=n*n,P=n,V=n-1;let total=0,first=null;
+  const ms=liar?range(n-1):[null];
+  for(const m of ms){
+    const need=cl=>!(liar&&cl.k==='t'&&cl.p===m);
+    const un=range(P).map(()=>[]),rel=range(P).map(()=>[]),empt=[],feet=[];
+    for(const cl of clues){
+      if(cl.t==='empty')empt.push(cl.v);else if(cl.t==='foot')feet.push(cl.v);
+      else if(REL.has(cl.t)){rel[cl.p].push(cl);rel[cl.q].push(cl)}else un[cl.p].push(cl)}
+    const cand=range(P).map(p=>{const o=[];for(let i=0;i<N;i++){
+      if(isBlock(cs.obj[i])||empt.includes(cs.room[i]))continue;
+      if(un[p].every(cl=>unaryOK(cl,i,cs)===need(cl)))o.push(i)}return o});
+    let order=range(P).sort((a,b)=>cand[a].length-cand[b].length);
+    if(liar)order=[V,m,...order.filter(p=>p!==V&&p!==m)];
+    const pos=new Array(P).fill(-1),ru=new Array(n).fill(false),cu=new Array(n).fill(false);
+    let cnt=0;
+    const bt=k=>{
+      if(k===P){if(feet.some(f=>!pos.includes(f)))return false;cnt++;if(!first)first=pos.slice();return total+cnt>=limit}
+      const p=order[k];
+      for(const i of cand[p]){const r=i/n|0,c=i%n;if(ru[r]||cu[c])continue;
+        if(liar&&p!==V){const inV=cs.room[i]===cs.room[pos[V]];if(p===m?!inV:inV)continue}
+        let ok=true;
+        for(const cl of rel[p]){const a=cl.p===p?i:pos[cl.p],b=cl.q===p?i:pos[cl.q];if(a<0||b<0)continue;
+          if(relOK(cl,a,b,cs)!==need(cl)){ok=false;break}}
+        if(!ok)continue;
+        pos[p]=i;ru[r]=cu[c]=true;if(bt(k+1))return true;pos[p]=-1;ru[r]=cu[c]=false}
+      return false};
+    bt(0);total+=cnt;if(total>=limit)break;
+  }
+  return{cnt:total,first};
+}
+
+// ===== Generador =====
+function genCase(level,seedStr){
+  const rng=mulberry(hashStr(seedStr));
+  const ch=chapterOf(level),n=ch.n,N=n*n,V=n-1;
+  const k=n<=4?3:n===5?4:n===6?5:6;
+  for(let att=0;att<1500;att++){
+    const room=new Array(N).fill(-1);
+    shuffle(range(N),rng).slice(0,k).forEach((s,q)=>room[s]=q);
+    growFrom(n,room,k,range(k).map(()=>0.6+rng()),rng);
+    if(range(k).some(q=>room.filter(x=>x===q).length<2))continue;
+    // puertas: árbol de expansión + extras
+    const groups={};
+    for(let i=0;i<N;i++){const r=i/n|0,c=i%n;
+      for(const j of [c<n-1?i+1:-1,r<n-1?i+n:-1]){if(j<0||room[i]===room[j])continue;
+        const key=Math.min(room[i],room[j])+'-'+Math.max(room[i],room[j]);(groups[key]=groups[key]||[]).push([i,j])}}
+    const par=range(k),find=x=>par[x]===x?x:(par[x]=find(par[x]));
+    const doors=[],dp=new Set();
+    for(const key of shuffle(Object.keys(groups),rng)){const [a,b]=key.split('-').map(Number);
+      const tree=find(a)!==find(b);if(tree||rng()<0.3){par[find(a)]=find(b);doors.push(pick(rng,groups[key]));dp.add(key)}}
+    // personas
+    const rows=shuffle(range(n),rng),cols=shuffle(range(n),rng);
+    const pos=range(n).map(p=>rows[p]*n+cols[p]);
+    const vr=room[pos[V]],withV=range(n-1).filter(p=>room[pos[p]]===vr);
+    if(withV.length!==1)continue;
+    const M=withV[0];
+    // objetos
+    const obj=new Array(N).fill(null),occ=new Set(pos);
+    const free=shuffle(range(N).filter(i=>!occ.has(i)),rng),nb=Math.round(N*0.2);
+    for(let t=0;t<nb;t++)obj[free[t]]=pick(rng,BT);
+    for(const p of range(n))if(rng()<0.4)obj[pos[p]]=rng()<0.65?'chair':'rug';
+    const rest=free.slice(nb);for(let t=0;t<Math.round(n*0.5)&&t<rest.length;t++)obj[rest[t]]=rng()<0.6?'chair':'rug';
+    const cs={n,room,obj,dp,k};
+    // ---- pool de pistas ----
+    const statements=p=>{const L=[];
+      for(let q=0;q<k;q++){L.push({t:'room',v:q,w:2.2});L.push({t:'nroom',v:q,w:.9})}
+      L.push({t:'on',v:'chair',w:2.5},{t:'on',v:'rug',w:2.2});
+      for(const b of BT){L.push({t:'next',v:b,w:2});L.push({t:'nnext',v:b,w:.8})}
+      for(const t of['top','bottom','left','right'])L.push({t,w:1.2});L.push({t:'corner',w:1.5});
+      if(level>6)for(let r=0;r<n;r++){L.push({t:'row',v:r,w:.35});L.push({t:'col',v:r,w:.3})}
+      if(ch.doors)for(let q=0;q<k;q++)L.push({t:'door',v:q,w:2.4});
+      if(level>2)for(let q=0;q<n;q++){if(q===p)continue;
+        L.push({t:'same',q,w:q===V?1.6:.9},{t:'diff',q,w:q===V?1.4:.7});
+        if(level>8)L.push({t:'above',q,w:.6},{t:'leftof',q,w:.6})}
+      return L.map(s=>Object.assign(s,{p}))};
+    const tPool=[],fPool=[];
+    for(let p=0;p<n-1;p++){const liarP=ch.liar&&p===M;
+      for(const s of statements(p)){s.k='t';const tv=REL.has(s.t)?relOK(s,pos[s.p],pos[s.q],cs):unaryOK(s,pos[p],cs);
+        if(tv!==!liarP)continue;
+        if(s.t==='door'&&room[pos[p]]===s.v)continue;
+        tPool.push(s)}}
+    for(const s of statements(V)){if(REL.has(s.t)||s.t==='door')continue;s.k='f';if(unaryOK(s,pos[V],cs))fPool.push(s)}
+    for(let q=0;q<k;q++)if(!pos.some(i=>room[i]===q))fPool.push({t:'empty',v:q,k:'f',w:2});
+    if(ch.feet){for(const p of shuffle(range(n),rng).slice(0,1+rnd(rng,2)))fPool.push({t:'foot',v:pos[p],k:'f',w:6})}
+    const wkey=cl=>Math.pow(rng(),1/cl.w);
+    const clues=[];
+    // una declaración inicial por sospechoso
+    for(let p=0;p<n-1;p++){const mine=tPool.filter(s=>s.p===p);if(!mine.length){clues.length=0;break}
+      mine.sort((a,b)=>wkey(b)-wkey(a));clues.push(mine[0])}
+    if(clues.length!==n-1)continue;
+    const pool=[...tPool,...fPool].filter(c=>!clues.includes(c));
+    pool.forEach(c=>c.key=wkey(c));pool.sort((a,b)=>b.key-a.key);
+    // las huellas siempre entran en el capítulo 4+
+    if(ch.feet)for(const f of pool.filter(c=>c.t==='foot'))clues.push(f);
+    let uniq=solveCase(cs,clues,2,ch.liar).cnt===1;
+    for(const cl of pool){if(uniq)break;if(clues.includes(cl))continue;
+      // el mentiroso como mucho 2 declaraciones, el resto máx. 3
+      const cntP=clues.filter(c=>c.k==='t'&&c.p===cl.p).length;
+      if(cl.k==='t'&&cntP>=(ch.liar&&cl.p===M?2:3))continue;
+      if(cl.k==='t'&&cl.t==='room'&&clues.some(c=>c.k==='t'&&c.p===cl.p&&c.t==='room'))continue;
+      clues.push(cl);uniq=solveCase(cs,clues,2,ch.liar).cnt===1}
+    if(!uniq)continue;
+    // podar
+    for(const cl of shuffle(clues.slice(),rng)){
+      if(cl.k==='t'&&clues.filter(c=>c.k==='t'&&c.p===cl.p).length<=1)continue;
+      const idx=clues.indexOf(cl);clues.splice(idx,1);
+      if(solveCase(cs,clues,2,ch.liar).cnt!==1)clues.splice(idx,0,cl)}
+    clues.forEach(c=>{delete c.key;delete c.w});
+    const people=shuffle(range(SUSP.length),rng).slice(0,n-1);
+    const roomIds=shuffle(range(ROOMS.length),rng).slice(0,k);
+    const victim=pick(rng,VICT);
+    return{n,room,obj,doors,dp:[...dp],k,pos,clues,murderer:M,people,roomIds,victim,title:pick(rng,TITLES).replace('{V}',victim),ch,att};
+  }
+  return null;
+}
+
+
+
+// ===================== ESTADO =====================
+const KEY='mansion-medianoche-v1';
+const DEF={level:1,solved:0,stars:0,coffee:3,sound:true,rain:false,streak:{last:'',count:0},daily:{},dailyLvl:{},ip:{},seenCh:{},archive:[],seenHelp:false};
+let S;try{S=Object.assign(structuredClone(DEF),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){S=structuredClone(DEF)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=s=>document.querySelector(s);
+const dstr=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>dstr(new Date());
+const yesterday=()=>{const d=new Date();d.setDate(d.getDate()-1);return dstr(d)};
+for(const k of Object.keys(S.ip))if(k.startsWith('D')&&k!=='D'+today())delete S.ip[k];
+const fmt=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+const strip=h=>h.replace(/<[^>]+>/g,'');
+
+const RCOL=['#cdb88c','#9db98d','#b4a2c9','#d09b85','#8db2c7','#c7bd72'];
+const RANKS=[['Becario',0,'🔎'],['Agente',3,'🕵️'],['Sargento',10,'🎖️'],['Inspector',20,'🔦'],['Comisario',35,'⭐'],['Leyenda',60,'👑']];
+const CH={
+ 1:{n:'La cena',s:'Lo básico',intro:`<div class="demo">🧔 👩‍🦰 💀</div>
+   <ul class="rules"><li>Cada persona estaba en <b>una fila y una columna distintas</b>. La víctima 💀 también.</li>
+   <li>Nadie puede estar encima de 🪴 📚 🍽️. En 🪑 sillas y alfombras sí.</li>
+   <li>Las declaraciones y el informe forense te dicen dónde estaba cada uno.</li>
+   <li>El culpable es el <b>único sospechoso que estuvo a solas con la víctima</b> en su habitación.</li></ul>`},
+ 2:{n:'El culpable miente',s:'Mentiras',intro:`<div class="demo">🤥 ➜ 🔪</div>
+   <ul class="rules"><li>A partir de ahora: <b>los inocentes dicen siempre la verdad</b>. El culpable <b>miente en todo</b> lo que declara.</li>
+   <li>El informe forense nunca miente.</li>
+   <li>Toca el sello de un sospechoso para marcarlo como <b>MIENTE</b>: sus frases se comprobarán al revés.</li>
+   <li>Si alguien mezcla verdades y mentiras, lo tienes mal colocado: nadie hace eso.</li></ul>`},
+ 3:{n:'Puertas',s:'Puertas',intro:`<div class="demo">🚪</div>
+   <ul class="rules"><li>Las líneas doradas en las paredes son <b>puertas</b> entre habitaciones.</li>
+   <li>Algunos dirán cosas como «mi habitación tenía una puerta que daba a la cocina». Si no hay puerta dorada entre esas dos habitaciones, no pudo estar ahí… o está mintiendo.</li></ul>`},
+ 4:{n:'Huellas',s:'Huellas',intro:`<div class="demo">👣</div>
+   <ul class="rules"><li>La policía ha marcado <b>huellas 👣</b> en el plano.</li>
+   <li>En cada casilla con huellas <b>estuvo exactamente una persona</b>. No sabes quién: eso lo deduces tú.</li></ul>`},
+ 5:{n:'Casos maestros',s:'Maestro',intro:`<div class="demo">🎻 🕯️ 🍷</div>
+   <ul class="rules"><li>Todo junto: mentiras, puertas y huellas.</li><li>Cada 10 casos, una mansión gigante de 7×7.</li></ul>`}};
+
+// ===================== SONIDO =====================
+let AC,rainNode=null;
+function ac(){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}return AC}
+function tone(f,d=.08,type='sine',v=.07,delay=0){if(!S.sound)return;const a=ac();if(!a)return;
+  const t=a.currentTime+delay,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
+  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.03)}
+function noiseBurst(d,freq,v){const a=ac();if(!a||!S.sound)return;const len=a.sampleRate*d,b=a.createBuffer(1,len,a.sampleRate),x=b.getChannelData(0);
+  for(let i=0;i<len;i++)x[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+  const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;f.type='lowpass';f.frequency.value=freq;g.gain.value=v;s.connect(f).connect(g).connect(a.destination);s.start()}
+const sfx={
+  tap:()=>tone(620,.05,'triangle',.04),
+  mark:()=>noiseBurst(.05,3000,.12),
+  place:()=>{noiseBurst(.07,900,.35);tone(196,.12,'sine',.08)},
+  bad:()=>{tone(110,.35,'sawtooth',.05);tone(104,.4,'sawtooth',.04,.05)},
+  stamp:()=>{noiseBurst(.12,600,.7);tone(80,.1,'sine',.15)},
+  type:()=>noiseBurst(.025,4000,.06),
+  thunder:()=>noiseBurst(1.8,300,.9),
+  win:()=>[392,494,587,784].forEach((f,i)=>tone(f,.4,'triangle',.06,i*.14))};
+function setRain(on){S.rain=on;save();$('#rain').classList.toggle('on',on);$('#gRain').classList.toggle('on',on);
+  const a=ac();if(!a)return;
+  if(on&&!rainNode){const len=a.sampleRate*2,b=a.createBuffer(1,len,a.sampleRate),x=b.getChannelData(0);let last=0;
+    for(let i=0;i<len;i++){last=(last+.04*(Math.random()*2-1))/1.04;x[i]=last*3+(Math.random()*2-1)*.08}
+    const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=b;s.loop=true;f.type='lowpass';f.frequency.value=1400;g.gain.value=.35;
+    s.connect(f).connect(g).connect(a.destination);s.start();rainNode={s,g}}
+  else if(!on&&rainNode){try{rainNode.s.stop()}catch(e){}rainNode=null}}
+function lightning(){const f=$('#flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');setTimeout(sfx.thunder,250)}
+
+let toastT;function toast(m,ms=2600){const t=$('#toast');t.innerHTML=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),ms)}
+
+// ===================== MODAL =====================
+let lock=false;
+function openModal(html,{paper=false,locked=false}={}){const s=$('#sheet');s.className='sheet'+(paper?' paper':'');s.innerHTML=html;$('#modal').hidden=false;lock=locked}
+function closeModal(){$('#modal').hidden=true;clearInterval(typer)}
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal'&&!lock)closeModal()});
+$('#sheet').addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(b&&A[b.dataset.act])A[b.dataset.act](b)});
+const A={close:closeModal};
+
+// ===================== HOME =====================
+function rankOf(n){let r=RANKS[0],nx=null;for(let i=0;i<RANKS.length;i++)if(n>=RANKS[i][1]){r=RANKS[i];nx=RANKS[i+1]||null}return{r,nx}}
+function streakNow(){return(S.streak.last===today()||S.streak.last===yesterday())?S.streak.count:0}
+function renderHome(){
+  $('#hCoffee').textContent='☕ '+S.coffee;$('#hStreak').textContent='🔥 '+streakNow()+' días';
+  const {r,nx}=rankOf(S.solved),pct=nx?Math.round((S.solved-r[1])/(nx[1]-r[1])*100):100;
+  $('#hRank').innerHTML=`<span class="badge">${r[2]}</span><span class="bar"><b>${r[0]}</b><small>${S.solved} casos cerrados · ${S.stars} ⭐${nx?' · '+(nx[1]-S.solved)+' para '+nx[0]:''}</small><div class="meter"><i style="width:${pct}%"></i></div></span>`;
+  const cs=genCase(S.level,'L'+S.level),ch=chapterOf(S.level);
+  $('#hNo').textContent='EXPEDIENTE Nº '+S.level;
+  $('#hTitle').textContent=cs.title;
+  $('#hDesc').textContent=`Capítulo ${ch.id}: ${CH[ch.id].n}. ${cs.n-1} sospechosos, ${cs.k} habitaciones, una víctima.`;
+  $('#hBtn').textContent=S.ip['L'+S.level]?'CONTINUAR INVESTIGACIÓN':'ABRIR EXPEDIENTE';
+  $('#hCh').innerHTML=[1,2,3,4,5].map(i=>`<div class="${i===ch.id?'cur':i>ch.id?'lock':''}"><b>${i>ch.id?'🔒':i}</b>${CH[i].s}</div>`).join('');
+  const dn=S.daily[today()];$('#hDaily').classList.toggle('done',!!dn);
+  $('#hDailyS').textContent=dn?'✓ Resuelto hoy. Vuelve mañana':'Un misterio nuevo cada día · +2 ☕';
+}
+function show(id){$('#home').hidden=id!=='home';$('#game').hidden=id!=='game';scrollTo(0,0);if(id==='home')renderHome()}
+
+// ===================== PARTIDA =====================
+let G=null,undo=[];
+const V=()=>G.cs.n-1;
+const nm=p=>p===V()?G.cs.victim:SUSP[G.cs.people[p]].n;
+const em=p=>p===V()?'💀':SUSP[G.cs.people[p]].e;
+const gd=p=>SUSP[G.cs.people[p]].g;
+const RM=q=>ROOMS[G.cs.roomIds[q]];
+function sText(cl){const g=cl.p===V()?'a':gd(cl.p),Q=cl.q!=null?`<b>${nm(cl.q)}</b>`:'',o=OBJ[cl.v];
+  switch(cl.t){
+    case 'room':return`Estuve ${RM(cl.v).in} toda la noche.`;
+    case 'nroom':return`En ningún momento pisé ${RM(cl.v).a}.`;
+    case 'on':return cl.v==='chair'?`Estuve sentad${g} en una silla 🪑.`:`Estuve de pie sobre una alfombra.`;
+    case 'next':return`Tenía ${o.a} ${o.e} justo al lado (no en diagonal).`;
+    case 'nnext':return`No tenía ${o.no} ${o.e} al lado.`;
+    case 'top':return`Estaba en la fila de más arriba.`;
+    case 'bottom':return`Estaba en la fila de más abajo.`;
+    case 'left':return`Estaba pegad${g} a la pared izquierda.`;
+    case 'right':return`Estaba pegad${g} a la pared derecha.`;
+    case 'corner':return`Estaba en una esquina de la casa.`;
+    case 'row':return`Estaba en la fila ${cl.v+1}, contando desde arriba.`;
+    case 'col':return`Estaba en la columna ${cl.v+1}, contando desde la izquierda.`;
+    case 'same':return`Estuve en la misma habitación que ${Q}.`;
+    case 'diff':return`No estuve en la misma habitación que ${Q}.`;
+    case 'above':return`Estaba en una fila más arriba que ${Q}.`;
+    case 'leftof':return`Estaba en una columna más a la izquierda que ${Q}.`;
+    case 'door':return`Mi habitación tenía una puerta que daba a ${RM(cl.v).a}.`;
+  }return''}
+function fText(cl){const o=OBJ[cl.v];
+  switch(cl.t){
+    case 'room':return`El cuerpo apareció ${RM(cl.v).in}.`;
+    case 'nroom':return`El cuerpo no estaba ${RM(cl.v).in}.`;
+    case 'on':return cl.v==='chair'?`La víctima estaba sentada en una silla 🪑.`:`El cuerpo estaba sobre una alfombra.`;
+    case 'next':return`Había ${o.a} ${o.e} justo al lado del cuerpo.`;
+    case 'nnext':return`No había ${o.no} ${o.e} al lado del cuerpo.`;
+    case 'top':return`El cuerpo estaba en la fila de más arriba.`;
+    case 'bottom':return`El cuerpo estaba en la fila de más abajo.`;
+    case 'left':return`El cuerpo estaba pegado a la pared izquierda.`;
+    case 'right':return`El cuerpo estaba pegado a la pared derecha.`;
+    case 'corner':return`El cuerpo estaba en una esquina de la casa.`;
+    case 'row':return`El cuerpo estaba en la fila ${cl.v+1}.`;
+    case 'col':return`El cuerpo estaba en la columna ${cl.v+1}.`;
+    case 'empty':return`Nadie entró ${RM(cl.v).in} en toda la noche.`;
+  }return''}
+
+function startCase(kind){
+  let lvl,key;
+  if(kind==='daily'){const t=today();S.dailyLvl[t]=S.dailyLvl[t]||Math.max(5,Math.min(S.level,45));lvl=S.dailyLvl[t];key='D'+t}
+  else{lvl=S.level;key='L'+lvl}
+  const cs=genCase(lvl,key==='L'+lvl?'L'+lvl:key);cs.dp=new Set(cs.dp);
+  const n=cs.n,ip=S.ip[key]||{place:new Array(n).fill(-1),marks:[],stamps:new Array(n).fill(0),mistakes:0,hints:0,time:0,phase:'solve',wa:{w:[],r:[],x:[]}};
+  G={kind,key,lvl,cs,place:ip.place.slice(),marks:new Set(ip.marks),stamps:ip.stamps.slice(),mistakes:ip.mistakes,hints:ip.hints,time:ip.time,phase:ip.phase,wa:ip.wa,sel:-1,lastWrong:'',acc:{w:-1,r:-1,x:-1}};
+  undo=[];
+  $('#gCh').textContent=(kind==='daily'?'CASO DEL DÍA · ':'Nº '+lvl+' · ')+'CAP. '+cs.ch.id+': '+CH[cs.ch.id].n.toUpperCase();
+  $('#gTitle').textContent=cs.title;
+  build();paint();show('game');persist();
+  if(!S.seenCh[cs.ch.id]){S.seenCh[cs.ch.id]=true;save();setTimeout(()=>chapterIntro(cs.ch.id),250)}
+  else if(G.phase==='accuse')setTimeout(openAccuse,300);
+}
+function chapterIntro(id){openModal(`<div class="kicker">Capítulo ${id}</div><h2>${CH[id].n}</h2>${CH[id].intro}<button class="btn" data-act="close">A investigar</button>`,{paper:true})}
+function persist(){if(!G||G.phase==='done')return;S.ip[G.key]={place:G.place,marks:[...G.marks],stamps:G.stamps,mistakes:G.mistakes,hints:G.hints,time:G.time,phase:G.phase,wa:G.wa};save()}
+
+function build(){
+  const cs=G.cs,n=cs.n,b=$('#board');b.style.setProperty('--n',n);b.classList.remove('reveal');b.innerHTML='';
+  const thin='1px solid rgba(30,20,20,.14)',thick='3px solid var(--wall)';
+  const feet=new Set(cs.clues.filter(c=>c.t==='foot').map(c=>c.v));
+  for(let i=0;i<n*n;i++){const r=i/n|0,c=i%n,d=document.createElement('div');d.className='cell'+(cs.obj[i]==='rug'?' rug':'');d.dataset.i=i;
+    d.style.background=RCOL[cs.room[i]];
+    if(r>0)d.style.borderTop=cs.room[i-n]!==cs.room[i]?thick:thin;
+    if(c>0)d.style.borderLeft=cs.room[i-1]!==cs.room[i]?thick:thin;
+    const o=cs.obj[i];
+    d.innerHTML=(o==='rug'?'<span class="rugbg"></span>':'')+(o&&OBJ[o].e?`<span class="obj">${OBJ[o].e}</span>`:'')+(feet.has(i)?'<span class="ft">👣</span>':'')+'<span class="slot"></span>';
+    b.appendChild(d)}
+  if(cs.ch.doors){const dv=document.createElement('div');dv.className='doors';
+    dv.innerHTML=cs.doors.map(([i,j])=>{const r=i/n|0,c=i%n,u=100/n;
+      return j===i+1?`<i class="door" style="left:calc(${(c+1)*u}% - 3.5px);top:${(r+.2)*u}%;width:7px;height:${.6*u}%"></i>`
+                    :`<i class="door" style="top:calc(${(r+1)*u}% - 3.5px);left:${(c+.2)*u}%;height:7px;width:${.6*u}%"></i>`}).join('');
+    b.appendChild(dv)}
+  $('#legend').innerHTML=cs.roomIds.map((id,q)=>`<span><i style="background:${RCOL[q]}"></i>${ROOMS[id].n} ${ROOMS[id].we}</span>`).join('');
+}
+function stmtState(cl){const tv=truthOf(cl,G.place,G.cs);if(tv==null)return'';
+  const liar=cl.k==='t'&&G.stamps[cl.p]===1;return(liar?!tv:tv)?'ok':'no'}
+function paint(){
+  const cs=G.cs,n=cs.n,cells=[...$('#board').querySelectorAll('.cell')],who=new Map();
+  G.place.forEach((i,p)=>{if(i>=0)who.set(i,p)});
+  const rc={},cc={};G.place.forEach(i=>{if(i<0)return;rc[i/n|0]=(rc[i/n|0]||0)+1;cc[i%n]=(cc[i%n]||0)+1});
+  cells.forEach((d,i)=>{const p=who.get(i),slot=d.querySelector('.slot'),s=p!=null?'p'+p:G.marks.has(i)?'x':'';
+    if(d.dataset.s!==s){d.dataset.s=s;slot.innerHTML=p!=null?`<span class="who${p===n-1?' v':''}">${em(p)}</span>`:s==='x'?'<span class="x">✕</span>':''}
+    d.classList.toggle('has',p!=null);d.classList.toggle('sel',p!=null&&p===G.sel);
+    d.classList.toggle('conf',p!=null&&(rc[i/n|0]>1||cc[i%n]>1));
+    const tk=G.sel>=0&&p==null&&G.place.some((j,q)=>q!==G.sel&&j>=0&&((j/n|0)===(i/n|0)||j%n===i%n));
+    d.classList.toggle('taken',tk);d.classList.toggle('target',G.sel>=0&&p==null&&!tk&&!isBlock(cs.obj[i]))});
+  // bandeja
+  $('#tray').innerHTML=Array.from({length:n},(_,p)=>{const st=G.stamps[p];
+    return`<button class="chip${p===n-1?' vict':''}${G.place[p]>=0?' placed':''}${G.sel===p?' sel':''}" data-p="${p}"><span>${em(p)}</span>${p===n-1?'Víctima':nm(p)}${st===1?'<i class="mk l">MIENTE</i>':st===2?'<i class="mk t">VERDAD</i>':''}</button>`}).join('');
+  // forense
+  const fz=cs.clues.filter(c=>c.k==='f'&&c.t!=='foot'),feet=cs.clues.filter(c=>c.t==='foot');
+  const line=(cl,txt)=>{const st=stmtState(cl);return`<div class="line ${st}"><span class="tx">${txt}</span><span class="st">${st==='ok'?'✓':st==='no'?'✕':''}</span></div>`};
+  const footSt=()=>{const all=feet.map(f=>stmtState(f));if(all.includes('no'))return'no';return all.every(x=>x==='ok')?'ok':''};
+  $('#forensic').innerHTML=`<h3>Informe forense <small>Nunca miente</small></h3>
+    <div class="line"><span class="tx">Víctima: <b>${cs.victim}</b> 💀. Hay ${n-1} sospechosos en la casa.</span><span class="st" style="border:0"></span></div>`+
+    fz.map(cl=>line(cl,fText(cl))).join('')+
+    (feet.length?`<div class="line ${footSt()}"><span class="tx">Hay huellas 👣 en ${feet.length===1?'una casilla':feet.length+' casillas'} del plano: en cada una estuvo alguien.</span><span class="st">${footSt()==='ok'?'✓':footSt()==='no'?'✕':''}</span></div>`:'')+
+    `<div class="rule">🔪 El culpable es el <b>único sospechoso a solas con la víctima</b> en su habitación.${cs.ch.liar?'<br>🤥 Los inocentes dicen la verdad. <b>El culpable miente en todo.</b>':''}</div>`;
+  // declaraciones
+  $('#file').innerHTML=`<h3>Declaraciones <small>${cs.ch.liar?'Toca el sello para marcar a quien miente':'Todos dicen la verdad'}</small></h3>`+
+    Array.from({length:n-1},(_,p)=>{const mine=cs.clues.filter(c=>c.k==='t'&&c.p===p),st=G.stamps[p];
+      const tv=mine.map(c=>truthOf(c,G.place,cs));let verdict='';
+      if(tv.length&&tv.every(x=>x!=null)){
+        if(tv.every(x=>x))verdict=`<div class="verdict good">Todo lo que dice cuadra.</div>`;
+        else if(tv.every(x=>!x))verdict=`<div class="verdict ${cs.ch.liar?'good':'bad'}">${cs.ch.liar?'Todo lo que dice es falso… ¿será el culpable?':'Nada cuadra: revisa dónde lo has puesto.'}</div>`;
+        else verdict=`<div class="verdict bad">Mezcla verdad y mentira. Nadie hace eso: algo está mal colocado.</div>`}
+      return`<div class="susp${G.sel===p?' sel':''}" data-p="${p}"><div class="sh"><span class="av">${em(p)}</span><span class="nm">${nm(p)}<small>${SUSP[cs.people[p]].j}</small></span>
+        ${cs.ch.liar?`<button class="seal ${st===1?'l':st===2?'t':''}" data-seal="${p}">${st===1?'MIENTE':st===2?'VERDAD':'SIN SELLO'}</button>`:''}</div>
+        ${mine.map(c=>line(c,`<span class="quote">${sText(c)}</span>`)).join('')}${verdict}</div>`}).join('');
+  $('#gTime').textContent=fmt(G.time);
+  $('#tAsk').innerHTML=`☕ Interrogar <small>${S.coffee}</small>`;
+  $('#accWrap').innerHTML=G.phase==='accuse'?'<button class="tbtn big" id="accBtn">🔪 ACUSAR AL CULPABLE</button>':'';
+  $('#gHelp').hidden=G.phase!=='solve';
+}
+function snap(){undo.push({place:G.place.slice(),marks:[...G.marks]});if(undo.length>200)undo.shift()}
+function sel(p){if(G.phase!=='solve')return;G.sel=G.sel===p?-1:p;sfx.tap();paint()}
+$('#tray').addEventListener('click',e=>{const c=e.target.closest('.chip');if(c&&G)sel(+c.dataset.p)});
+$('#file').addEventListener('click',e=>{if(!G)return;const s=e.target.closest('[data-seal]');
+  if(s){const p=+s.dataset.seal;G.stamps[p]=(G.stamps[p]+1)%3;sfx.stamp();paint();persist();return}
+  const c=e.target.closest('.susp');if(c){sel(+c.dataset.p);if(G.sel>=0)$('#tray').scrollIntoView({behavior:'smooth',block:'start'})}});
+$('#accWrap').addEventListener('click',e=>{if(e.target.closest('#accBtn'))openAccuse()});
+$('#board').addEventListener('click',e=>{
+  const cell=e.target.closest('.cell');if(!cell||!G||G.phase!=='solve')return;ac();
+  const i=+cell.dataset.i,cs=G.cs,q=G.place.indexOf(i);
+  if(q>=0){
+    if(G.sel===-1){G.sel=q;sfx.tap()}
+    else if(G.sel===q){snap();G.place[q]=-1;G.sel=-1;sfx.mark()}
+    else{snap();G.place[q]=-1;G.place[G.sel]=i;G.sel=-1;sfx.place()}
+  }else if(G.sel>=0){
+    if(isBlock(cs.obj[i])){toast(`Nadie puede estar encima de ${OBJ[cs.obj[i]].a} ${OBJ[cs.obj[i]].e}`);sfx.bad();return}
+    snap();G.place[G.sel]=i;G.marks.delete(i);
+    const nx=G.place.findIndex((v,p)=>v<0&&p!==G.sel);G.sel=-1;sfx.place();
+  }else{if(isBlock(cs.obj[i]))return;snap();G.marks.has(i)?G.marks.delete(i):G.marks.add(i);sfx.mark()}
+  paint();persist();check()});
+function check(){
+  if(G.place.some(i=>i<0)){G.lastWrong='';return}
+  const sig=G.place.join(',');
+  if(G.place.every((i,p)=>i===G.cs.pos[p])){G.phase='accuse';G.sel=-1;persist();paint();sfx.win();
+    toast('Todo encaja. Ahora, ¿quién fue?');setTimeout(openAccuse,900)}
+  else if(sig!==G.lastWrong){G.lastWrong=sig;G.mistakes++;persist();sfx.bad();
+    toast('Así no encaja. Busca las ✕ rojas, a quien mezcle verdad y mentira, y filas o columnas repetidas.',3600)}
+}
+$('#tUndo').onclick=()=>{if(!G||G.phase!=='solve'||!undo.length)return;const u=undo.pop();G.place=u.place;G.marks=new Set(u.marks);G.sel=-1;sfx.tap();paint();persist()};
+$('#tReset').onclick=()=>{if(!G||G.phase!=='solve')return;openModal(`<h2>¿Empezar de cero?</h2><p style="text-align:center">Todos vuelven a la bandeja. Se borran marcas y sellos.</p><button class="btn" data-act="resetOk">Sí, empezar de cero</button><button class="ghost" data-act="close">Cancelar</button>`)};
+A.resetOk=()=>{snap();G.place.fill(-1);G.marks.clear();G.stamps.fill(0);G.sel=-1;paint();persist();closeModal()};
+$('#tAsk').onclick=()=>{if(!G||G.phase!=='solve')return;
+  if(S.coffee<1){toast('Sin cafés ☕. Ganas uno por cada caso que cierras.');return}
+  const cs=G.cs,wrong=[];for(let p=0;p<cs.n;p++)if(G.place[p]!==cs.pos[p])wrong.push(p);if(!wrong.length)return;
+  const p=wrong.includes(G.sel)?G.sel:wrong[Math.floor(Math.random()*wrong.length)];
+  S.coffee--;G.hints++;snap();const occ=G.place.indexOf(cs.pos[p]);if(occ>=0)G.place[occ]=-1;G.place[p]=cs.pos[p];G.marks.delete(cs.pos[p]);G.sel=-1;
+  sfx.place();paint();const d=$('#board').querySelectorAll('.cell')[cs.pos[p]];d.classList.add('hint');setTimeout(()=>d.classList.remove('hint'),3000);
+  toast(p===V()?'El forense señala dónde cayó el cuerpo.':`${em(p)} ${nm(p)}: «Vale, vale… estaba aquí.»`);persist();check()};
+$('#gBack').onclick=()=>{persist();G=null;show('home')};
+$('#gRain').onclick=()=>{setRain(!S.rain);sfx.tap()};
+
+// ===================== ACUSACIÓN =====================
+function openAccuse(){const cs=G.cs,a=G.acc;
+  const weapons=cs.roomIds.map(id=>ROOMS[id]);
+  openModal(`<div class="kicker">Acusación formal</div><h2>¿Qué pasó con ${cs.victim}?</h2>
+  <div class="acc"><h4>Quién</h4><div class="opts">${Array.from({length:cs.n-1},(_,p)=>`<button class="opt${a.w===p?' on':''}${G.wa.w.includes(p)?' wrong':''}" data-act="pw" data-v="${p}"><span>${em(p)}</span>${nm(p)}</button>`).join('')}</div></div>
+  <div class="acc"><h4>Dónde</h4><div class="opts">${cs.roomIds.map((id,q)=>`<button class="opt${a.r===q?' on':''}${G.wa.r.includes(q)?' wrong':''}" data-act="pr" data-v="${q}"><i style="width:14px;height:14px;border-radius:4px;background:${RCOL[q]};display:block"></i>${ROOMS[id].n}</button>`).join('')}</div></div>
+  <div class="acc"><h4>Con qué</h4><div class="opts">${weapons.map((w,q)=>`<button class="opt${a.x===q?' on':''}${G.wa.x.includes(q)?' wrong':''}" data-act="px" data-v="${q}"><span>${w.we}</span>${w.w}</button>`).join('')}</div></div>
+  <p style="font-size:13px;opacity:.75;text-align:center">Cada habitación tiene su arma. Mira la leyenda bajo el plano.</p>
+  <button class="btn" data-act="accuse" ${a.w<0||a.r<0||a.x<0?'disabled':''}>Acusar</button>
+  <button class="ghost" data-act="close">Volver al plano</button>`,{paper:true})}
+const pickAcc=(k)=>b=>{const v=+b.dataset.v;if(G.wa[{w:'w',r:'r',x:'x'}[k]].includes(v))return;G.acc[k]=v;sfx.tap();openAccuse()};
+A.pw=pickAcc('w');A.pr=pickAcc('r');A.px=pickAcc('x');
+A.accuse=()=>{const cs=G.cs,a=G.acc,mr=cs.room[cs.pos[cs.murderer]];
+  const okW=a.w===cs.murderer,okR=a.r===mr,okX=a.x===mr;
+  if(okW&&okR&&okX){closeModal();solved();return}
+  if(!okW){G.wa.w.push(a.w);a.w=-1}if(!okR){G.wa.r.push(a.r);a.r=-1}if(!okX){G.wa.x.push(a.x);a.x=-1}
+  G.mistakes++;persist();lightning();
+  toast(['Quién','Dónde','Con qué'].filter((_,k)=>![okW,okR,okX][k]).join(', ')+': no. El juez frunce el ceño.');openAccuse()};
+
+let typer;
+function solved(){
+  const cs=G.cs,k=cs.murderer,r=RM(cs.room[cs.pos[k]]),daily=G.kind==='daily';
+  G.phase='done';delete S.ip[G.key];
+  const errs=G.mistakes+G.hints,stars=errs===0?3:errs<=2?2:1,gain=1+(stars===3?1:0)+(daily?2:0);
+  S.coffee+=gain;S.stars+=stars;S.solved++;
+  if(daily){S.daily[today()]=true;const t=today();if(S.streak.last!==t){S.streak.count=(S.streak.last===yesterday()?S.streak.count:0)+1;S.streak.last=t}}
+  else{S.archive.unshift({no:G.lvl,t:cs.title,s:stars,tm:G.time});S.archive=S.archive.slice(0,60);S.level++}
+  save();paint();
+  // reconstrucción: oscurecer todo menos culpable y víctima
+  const b=$('#board');b.classList.add('reveal');const cells=b.querySelectorAll('.cell');
+  cells.forEach((c,i)=>c.classList.toggle('spot',cs.room[i]===cs.room[cs.pos[k]]));
+  lightning();
+  const lie=cs.clues.find(c=>c.k==='t'&&c.p===k);
+  const story=`${nm(k)}, ${SUSP[cs.people[k]].j}, esperó a que ${cs.victim} se quedara a solas ${r.in}. Nadie más estaba allí. Usó ${r.w} ${r.we}.`+
+    (cs.ch.liar&&lie?` Luego mintió para cubrirse: «${strip(sText(lie))}»`:'');
+  setTimeout(()=>{sfx.win();
+    openModal(`<div class="kicker">Caso cerrado</div><h2>${cs.title}</h2>${starsHTML(stars)}
+    <div class="typed" id="typed"></div>
+    <div class="res"><span class="pill">⏱ ${fmt(G.time)}</span><span class="pill">❌ ${G.mistakes}</span><span class="pill">☕ usados ${G.hints}</span><span class="pill">+${gain} ☕</span></div>
+    ${daily?`<p style="text-align:center">Racha: 🔥 ${streakNow()} días</p><button class="btn" data-act="home">Volver a la mansión</button>`:`<button class="btn" data-act="next">Siguiente expediente →</button><button class="ghost" data-act="home">Volver al inicio</button>`}`,{paper:true,locked:true});
+    let i=0;const el=$('#typed');clearInterval(typer);
+    typer=setInterval(()=>{i++;el.innerHTML=story.slice(0,i)+'<span class="cur"></span>';if(i%3===0)sfx.type();if(i>=story.length)clearInterval(typer)},28);
+  },1300);
+}
+function starsHTML(n){return'<div class="stars">'+[1,2,3].map(i=>`<span class="${i<=n?'':'off'}">⭐</span>`).join('')+'</div>'}
+A.next=()=>{closeModal();const prev=chapterOf(S.level-1).id;startCase('level')};
+A.home=()=>{closeModal();G=null;show('home')};
+
+// ===================== TIMER =====================
+setInterval(()=>{if(document.hidden||!$('#modal').hidden||!G||G.phase!=='solve'||$('#game').hidden)return;
+  G.time++;$('#gTime').textContent=fmt(G.time);if(G.time%5===0)persist()},1000);
+
+// ===================== MENÚ =====================
+$('#hOpen').onclick=()=>{ac();if(S.rain)setRain(true);startCase('level')};
+$('#hDaily').onclick=()=>{if(S.daily[today()]){toast('El caso de hoy ya está cerrado. Mañana habrá otro.');return}ac();if(S.rain)setRain(true);startCase('daily')};
+function helpHTML(){const c=chapterOf(S.level).id;
+  return`<div class="kicker">Manual del detective</div><h2>Cómo jugar</h2>${CH[1].intro}
+  ${[2,3,4].filter(i=>i<=c||i===2).map(i=>`<h3 style="font-size:20px;margin-top:4px">${i<=c?'':'🔒 '}${CH[i].n}</h3>${i<=c?CH[i].intro:'<p style="opacity:.6">Se desbloquea más adelante.</p>'}`).join('')}
+  <ul class="rules"><li>☕ <b>Interrogar</b> coloca a alguien en su sitio real. Ganas cafés cerrando casos.</li>
+  <li>Cuando todo encaje, acusa: <b>quién</b>, <b>dónde</b> y <b>con qué</b>.</li>
+  <li>Cada caso tiene una única solución y se resuelve solo con lógica.</li></ul>
+  <button class="btn" data-act="close">Entendido</button>`}
+$('#mHelp').onclick=()=>openModal(helpHTML(),{paper:true});
+$('#mArch').onclick=()=>openModal(`<h2>Archivo</h2>${S.archive.length?`<div class="arch">${S.archive.map(a=>`<div><b>Nº ${a.no} · ${a.t}</b><span>${'⭐'.repeat(a.s)} ${fmt(a.tm)}</span></div>`).join('')}</div>`:'<p style="text-align:center;color:var(--mute)">Aún no has cerrado ningún caso.</p>'}<button class="ghost" data-act="close">Cerrar</button>`);
+function setHTML(){return`<h2>Ajustes</h2>
+  <button class="toggle${S.sound?' on':''}" data-act="tSound"><span>Sonido<small>Pasos, sellos y truenos</small></span><i></i></button>
+  <button class="toggle${S.rain?' on':''}" data-act="tRain"><span>Lluvia<small>Ambiente de tormenta mientras investigas</small></span><i></i></button>
+  <button class="ghost danger" data-act="wipe">Borrar todo el progreso</button>
+  <p style="font-size:12px;color:var(--mute);text-align:center">El progreso se guarda solo en este navegador. En Safari: Compartir → Añadir a pantalla de inicio, y lo tienes como app.</p>
+  <button class="btn" data-act="close">Listo</button>`}
+$('#mSet').onclick=()=>openModal(setHTML());
+A.tSound=()=>{S.sound=!S.sound;save();$('#sheet').innerHTML=setHTML();sfx.tap()};
+A.tRain=()=>{setRain(!S.rain);$('#sheet').innerHTML=setHTML()};
+A.wipe=b=>{if(b.dataset.sure){S=structuredClone(DEF);save();setRain(false);closeModal();renderHome();toast('Progreso borrado')}else{b.dataset.sure='1';b.textContent='Toca otra vez para confirmar'}};
+
+renderHome();
+if(S.rain)$('#rain').classList.add('on');
+if(!S.seenHelp){S.seenHelp=true;S.seenCh[1]=true;save();setTimeout(()=>openModal(`<div class="kicker">Medianoche. Llueve.</div><h2>Bienvenid@, detective</h2>
+  <p style="text-align:center">En esta mansión cada noche aparece un cadáver. Tú colocas a cada sospechoso en el plano con lo que declaran, y descubres quién fue.</p>${CH[1].intro}
+  <button class="btn" data-act="close">Abrir el primer caso</button>`,{paper:true}),350)}
+
+</script>
+
+<script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>
